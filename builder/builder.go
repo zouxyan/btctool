@@ -10,7 +10,6 @@ import (
 	"github.com/btcsuite/btcd/txscript"
 	"github.com/btcsuite/btcd/wire"
 	"github.com/btcsuite/btcutil"
-	"github.com/btcsuite/btcutil/base58"
 )
 
 type BuildCrossChainTxParam struct {
@@ -19,21 +18,21 @@ type BuildCrossChainTxParam struct {
 	ToMultiValue   float64
 	AddrScriptHash string
 	Locktime       *int64
-	PrevPkScripts  [][]byte
-	Privk58        string
+	PrevPkScript   []byte
+	Privk          *btcec.PrivateKey
 	NetParam       *chaincfg.Params
 	Data           []byte
 }
 
 type Builder struct {
-	NetParam      *chaincfg.Params
-	PrevPkScripts [][]byte
-	PrivKey       *btcec.PrivateKey
-	PubKey        *btcec.PublicKey
-	Tx            *wire.MsgTx
-	IsSigned      bool
-	RedeemScript  []byte
-	Privks        map[string]*btcec.PrivateKey
+	NetParam     *chaincfg.Params
+	PrevPkScript []byte
+	PrivKey      *btcec.PrivateKey
+	PubKey       *btcec.PublicKey
+	Tx           *wire.MsgTx
+	IsSigned     bool
+	RedeemScript []byte
+	Privks       map[string]*btcec.PrivateKey
 }
 
 func NewBuilder(param *BuildCrossChainTxParam) (b *Builder, err error) {
@@ -45,9 +44,8 @@ func NewBuilder(param *BuildCrossChainTxParam) (b *Builder, err error) {
 	}
 
 	b.Tx = mtx
-	privkey := base58.Decode(param.Privk58)
-	b.PrivKey, b.PubKey = btcec.PrivKeyFromBytes(btcec.S256(), privkey)
-	b.PrevPkScripts = param.PrevPkScripts
+	b.PrivKey = param.Privk
+	b.PrevPkScript = param.PrevPkScript
 	b.NetParam = param.NetParam
 
 	return b, nil
@@ -63,7 +61,7 @@ func (builder *Builder) LookUpKey(addr btcutil.Address) (*btcec.PrivateKey, bool
 // locking
 func (builder *Builder) BuildSignedTx() error {
 	for i, _ := range builder.Tx.TxIn {
-		sig, err := txscript.SignTxOutput(builder.NetParam, builder.Tx, i, builder.PrevPkScripts[i],
+		sig, err := txscript.SignTxOutput(builder.NetParam, builder.Tx, i, builder.PrevPkScript,
 			txscript.SigHashAll, txscript.KeyClosure(builder.LookUpKey), nil, nil)
 		if err != nil {
 			return fmt.Errorf("Failed to sign tx's No.%d input: %v", i, err)

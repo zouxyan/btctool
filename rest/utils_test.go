@@ -3,7 +3,6 @@ package rest
 import (
 	"encoding/hex"
 	"fmt"
-	"github.com/btcsuite/btcd/txscript"
 	"github.com/btcsuite/btcutil"
 	"testing"
 )
@@ -28,11 +27,8 @@ func TestSelectUtxos(t *testing.T) {
 }
 
 func TestSth(t *testing.T) {
-	str := "76a91428d2e8cee08857f569e5a1b147c5d5e87339e08188ac"
-	b, _ := hex.DecodeString(str)
-	s, err := txscript.DisasmString(b)
-	if err != nil {
-		t.Fatalf("%v", err)
-	}
-	fmt.Println(s)
+	str := "btc"
+	b := hex.EncodeToString([]byte(str))
+
+	fmt.Println(b)
 }
