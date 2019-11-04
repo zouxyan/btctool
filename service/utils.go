@@ -1,6 +1,7 @@
 package service
 
 import (
+	"encoding/hex"
 	mcom "github.com/ontio/multi-chain/common"
 	"github.com/ontio/multi-chain/native/service/cross_chain_manager/btc"
 	"github.com/ontio/ontology/common"
@@ -9,17 +10,29 @@ import (
 func buildData(toChainId uint64, ccFee int64, toAddr, contractAddr string) ([]byte, error) {
 	var data []byte
 	ccflag := byte(0x66)
-
-	contractAddrBytes, err := common.AddressFromHexString(contractAddr)
-	if err != nil {
-		return nil, err
-	}
-	addrBytes, _ := common.AddressFromBase58(toAddr)
-	args := &btc.Args{
-		Address:           addrBytes[:],
-		ToChainID:         toChainId,
-		Fee:               ccFee,
-		ToContractAddress: contractAddrBytes[:],
+	var args *btc.Args
+	switch toChainId {
+	case 1:
+		toAddrBytes, _ := hex.DecodeString(toAddr)
+		contract, _ := hex.DecodeString(contractAddr)
+		args = &btc.Args{
+			Address:           toAddrBytes[:],
+			ToChainID:         toChainId,
+			Fee:               ccFee,
+			ToContractAddress: contract[:],
+		}
+	case 2:
+		contractAddrBytes, err := common.AddressFromHexString(contractAddr)
+		if err != nil {
+			return nil, err
+		}
+		addrBytes, _ := common.AddressFromBase58(toAddr)
+		args = &btc.Args{
+			Address:           addrBytes[:],
+			ToChainID:         toChainId,
+			Fee:               ccFee,
+			ToContractAddress: contractAddrBytes[:],
+		}
 	}
 	var buf []byte
 	sink := mcom.NewZeroCopySink(buf)

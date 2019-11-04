@@ -30,6 +30,7 @@ var txids string
 var contractAddr string
 var dura int64
 var maxVal int64
+var toChainId uint64
 
 var addrScriptHash string = "2N5cY8y9RtbbvQRWkX5zAwTPCxSZF9xEj2C"
 
@@ -54,6 +55,8 @@ func init() {
 	flag.StringVar(&contractAddr, "contract", "", "target chain smart contract address")
 	flag.Int64Var(&dura, "dura", 300, "set the seconds to send a cross-tx, default 5 min")
 	flag.Int64Var(&maxVal, "maxval", 2000, "the max value of cross tx")
+	flag.Uint64Var(&toChainId, "tochain", 2, "target chain id")
+
 }
 
 func main() {
@@ -64,7 +67,6 @@ func main() {
 		handler := &service.RegAuto{
 			RpcUrl:         rpcUrl,
 			Privkb58:       privkb58,
-			Addr:           addr,
 			Fee:            fee,
 			Value:          value,
 			AddrScriptHash: addrScriptHash,
@@ -72,6 +74,7 @@ func main() {
 			Pwd:            pwd,
 			User:           user,
 			ContractAddr:   contractAddr,
+			ToChainId: toChainId,
 		}
 		handler.RunRegAuto()
 	case "cctx":

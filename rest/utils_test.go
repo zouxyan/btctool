@@ -1,7 +1,6 @@
 package rest
 
 import (
-	"encoding/hex"
 	"fmt"
 	"github.com/btcsuite/btcutil"
 	"testing"
@@ -27,8 +26,7 @@ func TestSelectUtxos(t *testing.T) {
 }
 
 func TestSth(t *testing.T) {
-	str := "btc"
-	b := hex.EncodeToString([]byte(str))
 
-	fmt.Println(b)
+
+	fmt.Println(0.00977637-0.00972871)
 }

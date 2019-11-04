@@ -26,6 +26,7 @@ type RegAuto struct {
 	Pwd            string
 	AddrScriptHash string
 	ContractAddr   string
+	ToChainId uint64
 }
 
 func (ra *RegAuto) RunRegAuto() {
@@ -51,7 +52,7 @@ func (ra *RegAuto) RunRegAuto() {
 		os.Exit(1)
 	}
 
-	data, err := buildData(2, 0, ra.OntAddr, ra.ContractAddr)
+	data, err := buildData(ra.ToChainId, 0, ra.OntAddr, ra.ContractAddr)
 	if err != nil {
 		log.Errorf("Failed to ge data: %v", err)
 		os.Exit(1)
