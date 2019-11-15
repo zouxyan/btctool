@@ -3,6 +3,7 @@ package rest
 import (
 	"fmt"
 	"github.com/btcsuite/btcutil"
+	"math"
 	"testing"
 )
 
@@ -26,7 +27,15 @@ func TestSelectUtxos(t *testing.T) {
 }
 
 func TestSth(t *testing.T) {
+	aa := make([]int, 0)
+	fmt.Printf("%v, cap(%d)\n", aa, cap(aa))
 
+	aa = append(aa, 1, 2, 3)
+	fmt.Printf("%v, cap(%d)\n", aa, cap(aa))
 
-	fmt.Println(0.00977637-0.00972871)
+	bb := make([]int, 10241)
+	aa = append(aa, bb...)
+	fmt.Printf("%v, cap(%d)\n", nil, cap(aa))
+	fmt.Println(math.Log2(float64(11264)))
 }
+

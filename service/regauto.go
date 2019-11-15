@@ -24,9 +24,10 @@ type RegAuto struct {
 	RpcUrl         string
 	User           string
 	Pwd            string
-	AddrScriptHash string
 	ContractAddr   string
 	ToChainId uint64
+	IsSegWit int
+	Redeem string
 }
 
 func (ra *RegAuto) RunRegAuto() {
@@ -102,7 +103,7 @@ func (ra *RegAuto) RunRegAuto() {
 	}
 
 	b, err := builder.NewBuilder(&builder.BuildCrossChainTxParam{
-		AddrScriptHash: ra.AddrScriptHash,
+		Redeem: ra.Redeem,
 		Data:           data,
 		Inputs:         ipts,
 		NetParam:       &chaincfg.RegressionNetParams,
@@ -117,6 +118,7 @@ func (ra *RegAuto) RunRegAuto() {
 				return map[string]float64{}
 			}
 		}(),
+		IsSegWit: ra.IsSegWit,
 	})
 	if err != nil {
 		log.Errorf("Failed to new an instance of Builder: %v", err)

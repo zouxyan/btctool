@@ -22,7 +22,6 @@ type CcTx struct {
 	OntAddr        string
 	Txids          string
 	Indexes        string
-	AddrScriptHash string
 	Privkb58       string
 	Value          float64
 	Fee            float64
@@ -30,6 +29,8 @@ type CcTx struct {
 	NetType        string
 	Vals           []float64
 	ContractAddr   string
+	Redeem string
+	IsSegWit int
 }
 
 func (cctx *CcTx) RunCcTx() *wire.MsgTx {
@@ -114,7 +115,6 @@ func (cctx *CcTx) RunCcTx() *wire.MsgTx {
 	}
 
 	b, err := builder.NewBuilder(&builder.BuildCrossChainTxParam{
-		AddrScriptHash: cctx.AddrScriptHash,
 		Data:           data,
 		Inputs:         ipts,
 		NetParam:       net,
@@ -129,6 +129,8 @@ func (cctx *CcTx) RunCcTx() *wire.MsgTx {
 				return map[string]float64{}
 			}
 		}(),
+		Redeem: cctx.Redeem,
+		IsSegWit: cctx.IsSegWit,
 	})
 	if err != nil {
 		log.Errorf("Failed to new an instance of Builder: %v", err)

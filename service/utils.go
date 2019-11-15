@@ -5,6 +5,7 @@ import (
 	mcom "github.com/ontio/multi-chain/common"
 	"github.com/ontio/multi-chain/native/service/cross_chain_manager/btc"
 	"github.com/ontio/ontology/common"
+	"strings"
 )
 
 func buildData(toChainId uint64, ccFee int64, toAddr, contractAddr string) ([]byte, error) {
@@ -13,6 +14,9 @@ func buildData(toChainId uint64, ccFee int64, toAddr, contractAddr string) ([]by
 	var args *btc.Args
 	switch toChainId {
 	case 1:
+		toAddr = strings.ReplaceAll(toAddr, "0x", "")
+		contractAddr = strings.ReplaceAll(contractAddr, "0x", "")
+
 		toAddrBytes, _ := hex.DecodeString(toAddr)
 		contract, _ := hex.DecodeString(contractAddr)
 		args = &btc.Args{

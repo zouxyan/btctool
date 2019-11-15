@@ -31,8 +31,11 @@ var contractAddr string
 var dura int64
 var maxVal int64
 var toChainId uint64
+var wit int
 
-var addrScriptHash string = "2N5cY8y9RtbbvQRWkX5zAwTPCxSZF9xEj2C"
+//only for test
+// TODO: use redeem to get these addresses
+var redeem string = "5521023ac710e73e1410718530b2686ce47f12fa3c470a9eb6085976b70b01c64c9f732102c9dc4d8f419e325bbef0fe039ed6feaf2079a2ef7b27336ddb79be2ea6e334bf2102eac939f2f0873894d8bf0ef2f8bbdd32e4290cbf9632b59dee743529c0af9e802103378b4a3854c88cca8bfed2558e9875a144521df4a75ab37a206049ccef12be692103495a81957ce65e3359c114e6c2fe9f97568be491e3f24d6fa66cc542e360cd662102d43e29299971e802160a92cfcd4037e8ae83fb8f6af138684bebdc5686f3b9db21031e415c04cbc9b81fbee6e04d8c902e8f61109a2c9883a959ba528c52698c055a57ae"
 
 func init() {
 	flag.StringVar(&tool, "tool", "", "which tool to use, \"regauto\", \"cctx\" or \"blkgene\"")
@@ -56,7 +59,7 @@ func init() {
 	flag.Int64Var(&dura, "dura", 300, "set the seconds to send a cross-tx, default 5 min")
 	flag.Int64Var(&maxVal, "maxval", 2000, "the max value of cross tx")
 	flag.Uint64Var(&toChainId, "tochain", 2, "target chain id")
-
+	flag.IntVar(&wit, "wit", 0, "use segwit for output")
 }
 
 func main() {
@@ -69,12 +72,13 @@ func main() {
 			Privkb58:       privkb58,
 			Fee:            fee,
 			Value:          value,
-			AddrScriptHash: addrScriptHash,
 			OntAddr:        ontAddr,
 			Pwd:            pwd,
 			User:           user,
 			ContractAddr:   contractAddr,
 			ToChainId: toChainId,
+			IsSegWit: wit,
+			Redeem: redeem,
 		}
 		handler.RunRegAuto()
 	case "cctx":
@@ -86,7 +90,6 @@ func main() {
 
 		handler := service.CcTx{
 			OntAddr:        ontAddr,
-			AddrScriptHash: addrScriptHash,
 			Value:          value,
 			Fee:            fee,
 			Privkb58:       privkb58,
@@ -96,6 +99,8 @@ func main() {
 			Vals:           valArr,
 			Txids:          txids,
 			ContractAddr:   contractAddr,
+			IsSegWit: wit,
+			Redeem: redeem,
 		}
 		handler.RunCcTx()
 	case "blkgene":
@@ -117,7 +122,6 @@ func main() {
 		handler := service.AutoSender{
 			CcTx: &service.CcTx{
 				OntAddr:        ontAddr,
-				AddrScriptHash: addrScriptHash,
 				Value:          value,
 				Fee:            fee,
 				Privkb58:       privkb58,
@@ -127,6 +131,8 @@ func main() {
 				Vals:           valArr,
 				Txids:          txids,
 				ContractAddr:   contractAddr,
+				Redeem: redeem,
+				IsSegWit: wit,
 			},
 			MaxVal: maxVal,
 			Dura:   dura,

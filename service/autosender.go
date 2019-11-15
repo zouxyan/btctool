@@ -2,7 +2,7 @@ package service
 
 import (
 	"github.com/btcsuite/btcutil"
-	"github.com/ontio/spvwallet/log"
+	"github.com/ontio/multi-chain/common/log"
 	"math/rand"
 	"os"
 	"strconv"
