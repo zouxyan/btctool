@@ -27,7 +27,7 @@ func (sender *AutoSender) sendingNotReg() {
 		select {
 		case t := <-tick.C:
 			log.Infof("\ntry to build a tx (%s)", t.String())
-			ptx := sender.CcTx.RunCcTx()
+			ptx := sender.CcTx.Run()
 			sender.CcTx.Txids = ptx.TxHash().String()
 			nextVal := rand.Int63n(sender.MaxVal-500) + 500
 			if len(ptx.TxOut) > 2 && ptx.TxOut[2].Value < nextVal {
@@ -51,14 +51,14 @@ func (sender *AutoSender) sendingReg() {
 		select {
 		case t := <-tick.C:
 			log.Infof("\ntry to build a tx (%s)", t.String())
-			sender.RegA.RunRegAuto()
+			sender.RegA.Run()
 			nextVal := rand.Int63n(sender.MaxVal-500) + 500
 			sender.RegA.Value = float64(nextVal) / btcutil.SatoshiPerBitcoin
 		}
 	}
 }
 
-func (sender *AutoSender) Sending() {
+func (sender *AutoSender) Run() {
 	switch sender.NetType {
 	case "test":
 		sender.sendingNotReg()

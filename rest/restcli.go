@@ -176,15 +176,15 @@ func (cli *RestCli) ListUnspent(minConfs, maxConfs int64, addr string) ([]*Utxo,
 		Id:      1,
 	})
 	if err != nil {
-		return nil, fmt.Errorf("[GetMempoolInfo] failed to marshal request: %v", err)
+		return nil, fmt.Errorf("[ListUnspent] failed to marshal request: %v", err)
 	}
 
 	resp, err := cli.sendPostReq(req)
 	if err != nil {
-		return nil, fmt.Errorf("[GetMempoolInfo] failed to send post: %v", err)
+		return nil, fmt.Errorf("[ListUnspent] failed to send post: %v", err)
 	}
 	if resp.Error != nil {
-		return nil, fmt.Errorf("[GetMempoolInfo] response shows failure: %v", resp.Error.Message)
+		return nil, fmt.Errorf("[ListUnspent] response shows failure: %v", resp.Error.Message)
 	}
 
 	utxos := make([]*Utxo, 0)
@@ -221,15 +221,15 @@ func (cli *RestCli) ImportAddress(addr string) error {
 		Id:      1,
 	})
 	if err != nil {
-		return fmt.Errorf("[GetMempoolInfo] failed to marshal request: %v", err)
+		return fmt.Errorf("[ImportAddress] failed to marshal request: %v", err)
 	}
 
 	resp, err := cli.sendPostReq(req)
 	if err != nil {
-		return fmt.Errorf("[GetMempoolInfo] failed to send post: %v", err)
+		return fmt.Errorf("[ImportAddress] failed to send post: %v", err)
 	}
 	if resp.Error != nil {
-		return fmt.Errorf("[GetMempoolInfo] response shows failure: %v", resp.Error.Message)
+		return fmt.Errorf("[ImportAddress] response shows failure: %v", resp.Error.Message)
 	}
 
 	return nil
@@ -243,15 +243,15 @@ func (cli *RestCli) GetBlockCount() (int64, error) {
 		Id:      1,
 	})
 	if err != nil {
-		return -1, fmt.Errorf("[GetMempoolInfo] failed to marshal request: %v", err)
+		return -1, fmt.Errorf("[GetBlockCount] failed to marshal request: %v", err)
 	}
 
 	resp, err := cli.sendPostReq(req)
 	if err != nil {
-		return -1, fmt.Errorf("[GetMempoolInfo] failed to send post: %v", err)
+		return -1, fmt.Errorf("[GetBlockCount] failed to send post: %v", err)
 	}
 	if resp.Error != nil {
-		return -1, fmt.Errorf("[GetMempoolInfo] response shows failure: %v", resp.Error.Message)
+		return -1, fmt.Errorf("[GetBlockCount] response shows failure: %v", resp.Error.Message)
 	}
 
 	return int64(resp.Result.(float64)), nil

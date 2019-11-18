@@ -1,7 +1,7 @@
 package service
 
 import (
-	"github.com/Zou-XueYan/btctool/rest"
+	"github.com/zouxyan/btctool/rest"
 	"github.com/ontio/multi-chain/common/log"
 	"os"
 	"time"
@@ -15,7 +15,7 @@ type BlkGene struct {
 	DefaultAddr string
 }
 
-func (bg *BlkGene) RunBlkGene() {
+func (bg *BlkGene) Run() {
 	if bg.Tsec <= 0 {
 		log.Error("tsec must be positive")
 		os.Exit(1)

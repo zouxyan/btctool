@@ -3,8 +3,8 @@ package service
 import (
 	"bytes"
 	"encoding/hex"
-	"github.com/Zou-XueYan/btctool/builder"
-	"github.com/Zou-XueYan/btctool/rest"
+	"github.com/zouxyan/btctool/builder"
+	"github.com/zouxyan/btctool/rest"
 	"github.com/btcsuite/btcd/btcec"
 	"github.com/btcsuite/btcd/btcjson"
 	"github.com/btcsuite/btcd/chaincfg"
@@ -30,7 +30,7 @@ type RegAuto struct {
 	Redeem string
 }
 
-func (ra *RegAuto) RunRegAuto() {
+func (ra *RegAuto) Run() string {
 	if ra.OntAddr == "" {
 		log.Error("ont address is required")
 		os.Exit(1)
@@ -64,27 +64,27 @@ func (ra *RegAuto) RunRegAuto() {
 	err = cli.ImportAddress(addr)
 	if err != nil {
 		log.Errorf("rpc failed: %v", err)
-		os.Exit(1)
+		//os.Exit(1)
 	}
 	cnt, err := cli.GetBlockCount()
 	if err != nil {
 		log.Errorf("rpc failed: %v", err)
-		os.Exit(1)
+		//os.Exit(1)
 	}
 	utxos, err := cli.ListUnspent(6, cnt, addr)
 	if err != nil {
 		log.Errorf("rpc failed: %v", err)
-		os.Exit(1)
+		//os.Exit(1)
 	}
 	total, err := btcutil.NewAmount(ra.Value + ra.Fee)
 	if err != nil {
 		log.Errorf("failed to new amount: %v", err)
-		os.Exit(1)
+		//os.Exit(1)
 	}
 	selected, sumVal, err := rest.SelectUtxos(utxos, int64(total))
 	if err != nil {
 		log.Errorf("failed to select utxo: %v", err)
-		os.Exit(1)
+		//os.Exit(1)
 	}
 
 	//var prevPkScripts [][]byte
@@ -154,4 +154,6 @@ func (ra *RegAuto) RunRegAuto() {
 		os.Exit(1)
 	}
 	log.Infof("send tx %s to regression net", txid)
+
+	return txid
 }

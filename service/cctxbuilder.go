@@ -3,8 +3,8 @@ package service
 import (
 	"bytes"
 	"encoding/hex"
-	"github.com/Zou-XueYan/btctool/builder"
-	"github.com/Zou-XueYan/btctool/rest"
+	"github.com/zouxyan/btctool/builder"
+	"github.com/zouxyan/btctool/rest"
 	"github.com/btcsuite/btcd/btcec"
 	"github.com/btcsuite/btcd/btcjson"
 	"github.com/btcsuite/btcd/chaincfg"
@@ -31,9 +31,10 @@ type CcTx struct {
 	ContractAddr   string
 	Redeem string
 	IsSegWit int
+	ToChainId uint64
 }
 
-func (cctx *CcTx) RunCcTx() *wire.MsgTx {
+func (cctx *CcTx) Run() *wire.MsgTx {
 	if cctx.OntAddr == "" {
 		log.Error("ont address is required")
 		os.Exit(1)
@@ -70,7 +71,7 @@ func (cctx *CcTx) RunCcTx() *wire.MsgTx {
 		os.Exit(1)
 	}
 
-	data, err := buildData(2, 0, cctx.OntAddr, cctx.ContractAddr)
+	data, err := buildData(cctx.ToChainId, 0, cctx.OntAddr, cctx.ContractAddr)
 	if err != nil {
 		log.Errorf("failed to build data: %v", err)
 		os.Exit(1)
@@ -161,7 +162,7 @@ func (cctx *CcTx) RunCcTx() *wire.MsgTx {
 
 	if cctx.SpvAddr == "" {
 		log.Infof("spv addr not set, you need to broadcast tx by yourself")
-		return nil
+		return b.Tx
 	}
 
 	cli := rest.NewRestCli("", "", "", cctx.SpvAddr)

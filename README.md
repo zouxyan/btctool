@@ -67,4 +67,4 @@ go build -o btctool main.go
 2019/11/04 14:34:10.220742 [INFO ] GID 1, spv addr not set, you need to broadcast tx by yourself
 ```
 
-​	如上，结果中的十六进制字符串即为签名后的交易，用户可通过其他工具自行广播，例如全节点rpc命令sendrawtransaction或者一些[网站](https://tbtc.bitaps.com/broadcast)，或者通过设置-spvaddr让[轻客户端](https://github.com/Zou-XueYan/spvwallet/tree/nowallet)去广播交易。
+​	如上，结果中的十六进制字符串即为签名后的交易，用户可通过其他工具自行广播，例如全节点rpc命令sendrawtransaction或者一些[网站](https://tbtc.bitaps.com/broadcast)，或者通过设置-spvaddr让[轻客户端](https://github.com/zouxyan/spvwallet/tree/nowallet)去广播交易。

@@ -45,3 +45,7 @@ func buildData(toChainId uint64, ccFee int64, toAddr, contractAddr string) ([]by
 
 	return data, nil
 }
+
+type Service interface {
+	Run()
+}
