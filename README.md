@@ -10,7 +10,45 @@
 go build -o btctool main.go
 ```
 
-## 运行
+## 运行GUI
+
+​	现在已经提供GUI版本的工具，请点击[下载](https://github.com/zouxyan/btctool/releases/download/0.1/btctool-macos)。
+
+​	下载GUI版本的工具后，双击之后显示如下。
+
+<img src="./doc/gui-1.png" alt="gui-1" style="zoom:38%;" />
+
+1. 首先选择工具。现在支持比特币测试网和本地私网，测试网当前跨链生态测试中的一部分，发送交易后，可以在目标链测试网看到余额变化，如果是本地私网，则需要自行搭建联盟链、目标链等环境。选择后，参数会有变化，以下以测试网为例。
+
+   <img src="/Users/zou/go/src/github.com/zouxyan/btctool/doc/select.png" alt="select" style="zoom:50%;" />
+
+2. 然后填写对应参数。如下表，测试网对应需要填入的参数，因为本工具没有实现钱包等复杂功能，所以UTXO的信息需要用户自行填入，可以使用测试网[浏览器](https://tbtc.bitaps.com/)查找自己地址的相关交易，找到未使用的输出即可。如果是私网，不需要指定UTXO，但需要配置节点的RPC信息。
+
+   | 参数               | 含义                                                         |
+   | :----------------- | :----------------------------------------------------------- |
+   | 跨链BTC金额        | 用户想要发送到目标链的BTC金额，如0.01                        |
+   | 目标链代币合约哈希 | 比特币在目标链的映射合约，一般为OEP4或者ERC20等，如[BTCX](https://github.com/zouxyan/btc_crosschain_demo) |
+   | 目标链ID           | 每条链在跨链生态中都有自己的ID，如比特币是0、本体是2         |
+   | 目标链地址         | 用户在目标链上用来接收BTC的地址                              |
+   | BTC交易手续费      | 构造比特币交易之后，发送交易需要的手续费，如0.00001          |
+   | 私钥(Base58)       | Base58形式的比特币私钥，用来对交易签名                       |
+   | UTXO的index        | 用户想使用的UTXO是前一笔交易的第几个输出，可以有多个，用逗号","隔开，如“0,2,2” |
+   | UTXO的金额         | 用户要使用的UTXO的金额，可以有多个，用逗号","隔开，如“0.01,0.02,0.1” |
+   | UTXO的交易ID       | UTXO的来源交易ID，可以有多个，用逗号","隔开                  |
+
+   比如下图，向本体链测试网转移了1000聪BTC：
+
+   <img src="/Users/zou/go/src/github.com/zouxyan/btctool/doc/param.png" alt="param" style="zoom:40%;" />
+
+3. 最后点击按钮，获得结果。测试网工具，会显示交易的十六进制字符串，用户只需复制字符串然后广播即可，私网则会通过参数中比特币全节点的RPC接口自动发送交易。比如：
+
+   <img src="/Users/zou/go/src/github.com/zouxyan/btctool/doc/res.png" style="zoom:50%;" />
+
+   拷贝上图中十六进制字符串，使用该[工具](https://tbtc.bitaps.com/broadcast)广播交易，获得交易ID“[5dd77e5a4a65a856e474a7286017097dc81e8f887d11a1bf3f2889530e523060](https://tbtc.bitaps.com/5dd77e5a4a65a856e474a7286017097dc81e8f887d11a1bf3f2889530e523060)”如下图：
+
+   <img src="/Users/zou/go/src/github.com/zouxyan/btctool/doc/broadcast.png" style="zoom:30%;" />
+
+## 命令行运行
 
 ​	btctool可以针对比特币测试网和本地仿真网络，如果使用跨链生态提供的测试网，那么btctool选择测试网即可，如果是在本地运行跨链测试网络，则选择仿真网络。
 

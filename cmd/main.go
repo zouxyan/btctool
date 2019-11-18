@@ -180,10 +180,10 @@ func startGui(quit chan struct{}) {
 		box1 := ui.NewVerticalBox()
 		info := ui.NewLabel("选择工具:")
 		combo := ui.NewCombobox()
-		combo.Append("构造本地测试网跨链交易")
+		combo.Append("构造本地私网跨链交易")
 		combo.Append("构造测试网跨链交易")
 		//combo.Append("autosender")
-		combo.SetSelected(0)
+		combo.SetSelected(1)
 		box1.Append(info, false)
 		box1.Append(combo, false)
 
@@ -233,8 +233,8 @@ func startGui(quit chan struct{}) {
 		cctxBox.Append(txids, false)
 		paramBox.Append(cctxBox, false)
 
-		//regBox.Hide()
-		cctxBox.Hide()
+		regBox.Hide()
+		//cctxBox.Hide()
 		var tool string = "regauto"
 		combo.OnSelected(func(combobox *ui.Combobox) {
 			switch combo.Selected() {
