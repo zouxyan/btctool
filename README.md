@@ -16,11 +16,11 @@ go build -o btctool main.go
 
 ​	下载GUI版本的工具后，双击之后显示如下。
 
-<div align=center><img width="410" height="500" src="./doc/gui-1.png"/></div>
+<div align=center><img width="410" height="450" src="./doc/gui.png"/></div>
 
 1. 首先选择工具。现在支持比特币测试网和本地私网，测试网当前跨链生态测试中的一部分，发送交易后，可以在目标链测试网看到余额变化，如果是本地私网，则需要自行搭建联盟链、目标链等环境。选择后，参数会有变化，以下以测试网为例。
 
-   <div align=center><img width="430" height="60" src="./doc/select.png"/></div>
+   <div align=center><img width="430" height="60" src="./doc/sel.jpeg"/></div>
 
 2. 然后填写对应参数。如下表，测试网对应需要填入的参数，因为本工具没有实现钱包等复杂功能，所以UTXO的信息需要用户自行填入，可以使用测试网[浏览器](https://tbtc.bitaps.com/)查找自己地址的相关交易，找到未使用的输出即可。如果是私网，不需要指定UTXO，但需要配置节点的RPC信息。
 
@@ -38,15 +38,14 @@ go build -o btctool main.go
 
    比如下图，向本体链测试网转移了1000聪BTC：
 
-   <div align=center><img width="470" height="410" src="./doc/param.png"/></div>
+   <div align=center><img width="390" height="180" src="./doc/param.jpeg"/></div>
 
 3. 最后点击按钮，获得结果。测试网工具，会显示交易的十六进制字符串，用户只需复制字符串然后广播即可，私网则会通过参数中比特币全节点的RPC接口自动发送交易。比如：
 
    <div align=center><img width="470" height="150" src="./doc/res.png"/></div>
-
-   拷贝上图中十六进制字符串，使用该[工具](https://tbtc.bitaps.com/broadcast)广播交易，获得交易ID“[5dd77e5a4a65a856e474a7286017097dc81e8f887d11a1bf3f2889530e523060](https://tbtc.bitaps.com/5dd77e5a4a65a856e474a7286017097dc81e8f887d11a1bf3f2889530e523060)”如下图：
-
-   <div align=center><img width="580" height="150" src="./doc/broadcast.png"/></div>
+拷贝上图中十六进制字符串，使用该[工具](https://tbtc.bitaps.com/broadcast)广播交易，获得交易ID“[5dd77e5a4a65a856e474a7286017097dc81e8f887d11a1bf3f2889530e523060](https://tbtc.bitaps.com/5dd77e5a4a65a856e474a7286017097dc81e8f887d11a1bf3f2889530e523060)”如下图：
+   
+<div align=center><img width="580" height="150" src="./doc/broadcast.png"/></div>
 
 ## 命令行运行
 

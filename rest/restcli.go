@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"github.com/btcsuite/btcd/btcjson"
 	"github.com/btcsuite/btcutil"
-	"github.com/ontio/spvclient/rest/http/common"
+	"github.com/ontio/btc-spvclient/rest/http/common"
 	"io/ioutil"
 	"net/http"
 	"net/url"

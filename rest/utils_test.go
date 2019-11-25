@@ -38,4 +38,3 @@ func TestSth(t *testing.T) {
 	fmt.Printf("%v, cap(%d)\n", nil, cap(aa))
 	fmt.Println(math.Log2(float64(11264)))
 }
-

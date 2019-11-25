@@ -6,13 +6,13 @@ import (
 	"flag"
 	"fmt"
 	"github.com/andlabs/ui"
+	_ "github.com/andlabs/ui/winmanifest"
 	"github.com/btcsuite/btcd/wire"
-	"github.com/zouxyan/btctool/service"
 	"github.com/ontio/multi-chain/common/log"
+	"github.com/zouxyan/btctool/service"
 	"os"
 	"strconv"
 	"strings"
-	_ "github.com/andlabs/ui/winmanifest"
 )
 
 var prevHexTxs string
@@ -44,7 +44,7 @@ var runGui int
 var redeem string = "5521023ac710e73e1410718530b2686ce47f12fa3c470a9eb6085976b70b01c64c9f732102c9dc4d8f419e325bbef0fe039ed6feaf2079a2ef7b27336ddb79be2ea6e334bf2102eac939f2f0873894d8bf0ef2f8bbdd32e4290cbf9632b59dee743529c0af9e802103378b4a3854c88cca8bfed2558e9875a144521df4a75ab37a206049ccef12be692103495a81957ce65e3359c114e6c2fe9f97568be491e3f24d6fa66cc542e360cd662102d43e29299971e802160a92cfcd4037e8ae83fb8f6af138684bebdc5686f3b9db21031e415c04cbc9b81fbee6e04d8c902e8f61109a2c9883a959ba528c52698c055a57ae"
 
 func init() {
-	flag.StringVar(&tool, "tool", "", "which tool to use, \"regauto\", \"cctx\" or \"blkgene\"")
+	flag.StringVar(&tool, "tool", "", "which tool to use, \"reg\", \"test\" or \"blkgene\"")
 	flag.StringVar(&prevHexTxs, "hextxs", "", "Raw transaction in hex")
 	flag.StringVar(&indexes, "idxes", "", "Your UTXO's index for building this transaction")
 	flag.StringVar(&privkb58, "privkb58", "", "Your private key in base58")
@@ -81,41 +81,41 @@ func main() {
 		}
 	}
 	switch tool {
-	case "regauto":
-		handler := &service.RegAuto{
-			RpcUrl:         rpcUrl,
-			Privkb58:       privkb58,
-			Fee:            fee,
-			Value:          value,
-			OntAddr:        ontAddr,
-			Pwd:            pwd,
-			User:           user,
-			ContractAddr:   contractAddr,
-			ToChainId: toChainId,
-			IsSegWit: wit,
-			Redeem: redeem,
+	case "reg":
+		handler := &service.RegTxBuilder{
+			RpcUrl:       rpcUrl,
+			Privkb58:     privkb58,
+			Fee:          fee,
+			Value:        value,
+			OntAddr:      ontAddr,
+			Pwd:          pwd,
+			User:         user,
+			ContractAddr: contractAddr,
+			ToChainId:    toChainId,
+			IsSegWit:     wit,
+			Redeem:       redeem,
 		}
 		handler.Run()
-	case "cctx":
+	case "test":
 		valArr, err := getVals(utxoVals)
 		if err != nil {
 			log.Errorf("failed to get vals: %v", err)
 			os.Exit(1)
 		}
 
-		handler := service.CcTx{
-			OntAddr:        ontAddr,
-			Value:          value,
-			Fee:            fee,
-			Privkb58:       privkb58,
-			Indexes:        indexes,
-			SpvAddr:        spvAddr,
-			NetType:        netType,
-			Vals:           valArr,
-			Txids:          txids,
-			ContractAddr:   contractAddr,
-			IsSegWit: wit,
-			Redeem: redeem,
+		handler := service.TestTxBuilder{
+			OntAddr:      ontAddr,
+			Value:        value,
+			Fee:          fee,
+			Privkb58:     privkb58,
+			Indexes:      indexes,
+			SpvAddr:      spvAddr,
+			NetType:      netType,
+			Vals:         valArr,
+			Txids:        txids,
+			ContractAddr: contractAddr,
+			IsSegWit:     wit,
+			Redeem:       redeem,
 		}
 		handler.Run()
 	case "blkgene":
@@ -135,19 +135,19 @@ func main() {
 		}
 
 		handler := service.AutoSender{
-			CcTx: &service.CcTx{
-				OntAddr:        ontAddr,
-				Value:          value,
-				Fee:            fee,
-				Privkb58:       privkb58,
-				Indexes:        indexes,
-				SpvAddr:        spvAddr,
-				NetType:        netType,
-				Vals:           valArr,
-				Txids:          txids,
-				ContractAddr:   contractAddr,
-				Redeem: redeem,
-				IsSegWit: wit,
+			CcTx: &service.TestTxBuilder{
+				OntAddr:      ontAddr,
+				Value:        value,
+				Fee:          fee,
+				Privkb58:     privkb58,
+				Indexes:      indexes,
+				SpvAddr:      spvAddr,
+				NetType:      netType,
+				Vals:         valArr,
+				Txids:        txids,
+				ContractAddr: contractAddr,
+				Redeem:       redeem,
+				IsSegWit:     wit,
 			},
 			MaxVal: maxVal,
 			Dura:   dura,
@@ -179,14 +179,13 @@ func getVals(val string) ([]float64, error) {
 func startGui(quit chan struct{}) {
 	err := ui.Main(func() {
 		box1 := ui.NewVerticalBox()
-		info := ui.NewLabel("选择工具:")
+		formSelect := ui.NewForm()
 		combo := ui.NewCombobox()
 		combo.Append("构造本地私网跨链交易")
 		combo.Append("构造测试网跨链交易")
-		//combo.Append("autosender")
 		combo.SetSelected(1)
-		box1.Append(info, false)
-		box1.Append(combo, false)
+		formSelect.Append("选择工具: ", combo, false)
+		box1.Append(formSelect, false)
 
 		paramBox := ui.NewVerticalBox()
 		fee := ui.NewEntry()
@@ -195,18 +194,14 @@ func startGui(quit chan struct{}) {
 		value := ui.NewEntry()
 		contract := ui.NewEntry()
 		toChainId := ui.NewEntry()
-		paramBox.Append(ui.NewLabel("跨链BTC金额:"), false)
-		paramBox.Append(value, false)
-		paramBox.Append(ui.NewLabel("目标链代币合约哈希:"), false)
-		paramBox.Append(contract, false)
-		paramBox.Append(ui.NewLabel("目标链ID:"), false)
-		paramBox.Append(toChainId, false)
-		paramBox.Append(ui.NewLabel("目标链地址:"), false)
-		paramBox.Append(targetAddr, false)
-		paramBox.Append(ui.NewLabel("BTC交易手续费:"), false)
-		paramBox.Append(fee, false)
-		paramBox.Append(ui.NewLabel("私钥(Base58):"), false)
-		paramBox.Append(privkb58, false)
+		formParam := ui.NewForm()
+		formParam.Append("跨链BTC金额: ", value, false)
+		formParam.Append("目标链代币合约哈希: ", contract, false)
+		formParam.Append("目标链ID: ", toChainId, false)
+		formParam.Append("目标链地址: ", targetAddr, false)
+		formParam.Append("BTC交易手续费: ", fee, false)
+		formParam.Append("私钥(Base58): ", privkb58, false)
+		paramBox.Append(formParam, false)
 
 		pwd := ui.NewEntry()
 		user := ui.NewEntry()
@@ -216,27 +211,28 @@ func startGui(quit chan struct{}) {
 		utxoVals := ui.NewEntry()
 		txids := ui.NewEntry()
 
+		regG := ui.NewGroup("")
 		regBox := ui.NewVerticalBox()
-		regBox.Append(ui.NewLabel("rpc用户:"), false)
-		regBox.Append(user, false)
-		regBox.Append(ui.NewLabel("rpc密码:"), false)
-		regBox.Append(pwd, false)
-		regBox.Append(ui.NewLabel("rpcURL:"), false)
-		regBox.Append(url, false)
+		formRpc := ui.NewForm()
+		formRpc.Append("rpcURL: ", url, false)
+		formRpc.Append("rpc用户: ", user, false)
+		formRpc.Append("rpc密码: ", pwd, false)
+		regG.SetChild(formRpc)
+		regBox.Append(regG, false)
 		paramBox.Append(regBox, false)
 
+		testG := ui.NewGroup("")
 		cctxBox := ui.NewVerticalBox()
-		cctxBox.Append(ui.NewLabel("UTXO的index:"), false)
-		cctxBox.Append(index, false)
-		cctxBox.Append(ui.NewLabel("UTXO的金额:"), false)
-		cctxBox.Append(utxoVals, false)
-		cctxBox.Append(ui.NewLabel("UTXO的交易ID:"), false)
-		cctxBox.Append(txids, false)
+		form := ui.NewForm()
+		form.Append("UTXO的index: ", index, false)
+		form.Append("UTXO的金额: ", utxoVals, false)
+		form.Append("UTXO的交易ID: ", txids, false)
+		testG.SetChild(form)
+		cctxBox.Append(testG, false)
 		paramBox.Append(cctxBox, false)
 
 		regBox.Hide()
-		//cctxBox.Hide()
-		var tool string = "regauto"
+		var tool = "regauto"
 		combo.OnSelected(func(combobox *ui.Combobox) {
 			switch combo.Selected() {
 			case 0:
@@ -278,7 +274,7 @@ func startGui(quit chan struct{}) {
 
 			switch tool {
 			case "regauto":
-				handler := &service.RegAuto{
+				handler := &service.RegTxBuilder{
 					RpcUrl:       url.Text(),
 					Privkb58:     privkb58.Text(),
 					Fee:          feeVal,
@@ -299,7 +295,7 @@ func startGui(quit chan struct{}) {
 					os.Exit(1)
 				}
 
-				handler := &service.CcTx{
+				handler := &service.TestTxBuilder{
 					Privkb58:     privkb58.Text(),
 					Fee:          feeVal,
 					Value:        valueVal,
@@ -308,10 +304,10 @@ func startGui(quit chan struct{}) {
 					ToChainId:    toChainIdVal,
 					IsSegWit:     0,
 					Redeem:       "5521023ac710e73e1410718530b2686ce47f12fa3c470a9eb6085976b70b01c64c9f732102c9dc4d8f419e325bbef0fe039ed6feaf2079a2ef7b27336ddb79be2ea6e334bf2102eac939f2f0873894d8bf0ef2f8bbdd32e4290cbf9632b59dee743529c0af9e802103378b4a3854c88cca8bfed2558e9875a144521df4a75ab37a206049ccef12be692103495a81957ce65e3359c114e6c2fe9f97568be491e3f24d6fa66cc542e360cd662102d43e29299971e802160a92cfcd4037e8ae83fb8f6af138684bebdc5686f3b9db21031e415c04cbc9b81fbee6e04d8c902e8f61109a2c9883a959ba528c52698c055a57ae",
-					NetType: "test",
-					Indexes: index.Text(),
-					Vals: valArr,
-					Txids: txids.Text(),
+					NetType:      "test",
+					Indexes:      index.Text(),
+					Vals:         valArr,
+					Txids:        txids.Text(),
 				}
 				tx := handler.Run()
 				var buf bytes.Buffer
@@ -338,7 +334,7 @@ func startGui(quit chan struct{}) {
 		div.Append(resultBox, true)
 		div.SetPadded(false)
 
-		window := ui.NewWindow("比特币跨链交易构造工具", 600, 1500, false)
+		window := ui.NewWindow("比特币跨链交易构造工具", 600, 600, false)
 		window.SetChild(div)
 		window.SetMargined(true)
 		window.OnClosing(func(*ui.Window) bool {

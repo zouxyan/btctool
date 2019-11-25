@@ -3,8 +3,6 @@ package service
 import (
 	"bytes"
 	"encoding/hex"
-	"github.com/zouxyan/btctool/builder"
-	"github.com/zouxyan/btctool/rest"
 	"github.com/btcsuite/btcd/btcec"
 	"github.com/btcsuite/btcd/btcjson"
 	"github.com/btcsuite/btcd/chaincfg"
@@ -13,28 +11,30 @@ import (
 	"github.com/btcsuite/btcutil"
 	"github.com/btcsuite/btcutil/base58"
 	"github.com/ontio/ontology/common/log"
+	"github.com/zouxyan/btctool/builder"
+	"github.com/zouxyan/btctool/rest"
 	"os"
 	"strconv"
 	"strings"
 )
 
-type CcTx struct {
-	OntAddr        string
-	Txids          string
-	Indexes        string
-	Privkb58       string
-	Value          float64
-	Fee            float64
-	SpvAddr        string
-	NetType        string
-	Vals           []float64
-	ContractAddr   string
-	Redeem string
-	IsSegWit int
-	ToChainId uint64
+type TestTxBuilder struct {
+	OntAddr      string
+	Txids        string
+	Indexes      string
+	Privkb58     string
+	Value        float64
+	Fee          float64
+	SpvAddr      string
+	NetType      string
+	Vals         []float64
+	ContractAddr string
+	Redeem       string
+	IsSegWit     int
+	ToChainId    uint64
 }
 
-func (cctx *CcTx) Run() *wire.MsgTx {
+func (cctx *TestTxBuilder) Run() *wire.MsgTx {
 	if cctx.OntAddr == "" {
 		log.Error("ont address is required")
 		os.Exit(1)
@@ -116,13 +116,13 @@ func (cctx *CcTx) Run() *wire.MsgTx {
 	}
 
 	b, err := builder.NewBuilder(&builder.BuildCrossChainTxParam{
-		Data:           data,
-		Inputs:         ipts,
-		NetParam:       net,
-		PrevPkScript:   pubkScript,
-		Privk:          privk,
-		Locktime:       nil,
-		ToMultiValue:   cctx.Value,
+		Data:         data,
+		Inputs:       ipts,
+		NetParam:     net,
+		PrevPkScript: pubkScript,
+		Privk:        privk,
+		Locktime:     nil,
+		ToMultiValue: cctx.Value,
 		Changes: func() map[string]float64 {
 			if changeVal := amount - cctx.Value - cctx.Fee; changeVal > 0 {
 				return map[string]float64{addrPubk.EncodeAddress(): changeVal}
@@ -130,7 +130,7 @@ func (cctx *CcTx) Run() *wire.MsgTx {
 				return map[string]float64{}
 			}
 		}(),
-		Redeem: cctx.Redeem,
+		Redeem:   cctx.Redeem,
 		IsSegWit: cctx.IsSegWit,
 	})
 	if err != nil {

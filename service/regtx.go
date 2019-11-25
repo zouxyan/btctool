@@ -3,8 +3,6 @@ package service
 import (
 	"bytes"
 	"encoding/hex"
-	"github.com/zouxyan/btctool/builder"
-	"github.com/zouxyan/btctool/rest"
 	"github.com/btcsuite/btcd/btcec"
 	"github.com/btcsuite/btcd/btcjson"
 	"github.com/btcsuite/btcd/chaincfg"
@@ -13,24 +11,26 @@ import (
 	"github.com/btcsuite/btcutil"
 	"github.com/btcsuite/btcutil/base58"
 	"github.com/ontio/multi-chain/common/log"
+	"github.com/zouxyan/btctool/builder"
+	"github.com/zouxyan/btctool/rest"
 	"os"
 )
 
-type RegAuto struct {
-	Fee            float64
-	Value          float64
-	Privkb58       string
-	OntAddr        string
-	RpcUrl         string
-	User           string
-	Pwd            string
-	ContractAddr   string
-	ToChainId uint64
-	IsSegWit int
-	Redeem string
+type RegTxBuilder struct {
+	Fee          float64
+	Value        float64
+	Privkb58     string
+	OntAddr      string
+	RpcUrl       string
+	User         string
+	Pwd          string
+	ContractAddr string
+	ToChainId    uint64
+	IsSegWit     int
+	Redeem       string
 }
 
-func (ra *RegAuto) Run() string {
+func (ra *RegTxBuilder) Run() string {
 	if ra.OntAddr == "" {
 		log.Error("ont address is required")
 		os.Exit(1)
@@ -103,14 +103,14 @@ func (ra *RegAuto) Run() string {
 	}
 
 	b, err := builder.NewBuilder(&builder.BuildCrossChainTxParam{
-		Redeem: ra.Redeem,
-		Data:           data,
-		Inputs:         ipts,
-		NetParam:       &chaincfg.RegressionNetParams,
-		PrevPkScript:   pubkScript,
-		Privk:          privk,
-		Locktime:       nil,
-		ToMultiValue:   ra.Value,
+		Redeem:       ra.Redeem,
+		Data:         data,
+		Inputs:       ipts,
+		NetParam:     &chaincfg.RegressionNetParams,
+		PrevPkScript: pubkScript,
+		Privk:        privk,
+		Locktime:     nil,
+		ToMultiValue: ra.Value,
 		Changes: func() map[string]float64 {
 			if changeVal := float64(sumVal)/btcutil.SatoshiPerBitcoin - ra.Value - ra.Fee; changeVal > 0 {
 				return map[string]float64{addrPubk.EncodeAddress(): changeVal}

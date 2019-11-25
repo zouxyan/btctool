@@ -10,8 +10,8 @@ import (
 )
 
 type AutoSender struct {
-	CcTx    *CcTx
-	RegA    *RegAuto
+	CcTx    *TestTxBuilder
+	RegA    *RegTxBuilder
 	Dura    int64
 	MaxVal  int64
 	NetType string

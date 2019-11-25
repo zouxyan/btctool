@@ -15,16 +15,16 @@ import (
 )
 
 type BuildCrossChainTxParam struct {
-	Inputs         []btcjson.TransactionInput
-	Changes        map[string]float64 //pay to pubK
-	ToMultiValue   float64
-	Redeem string
-	Locktime       *int64
-	PrevPkScript   []byte
-	Privk          *btcec.PrivateKey
-	NetParam       *chaincfg.Params
-	Data           []byte
-	IsSegWit int
+	Inputs       []btcjson.TransactionInput
+	Changes      map[string]float64 //pay to pubK
+	ToMultiValue float64
+	Redeem       string
+	Locktime     *int64
+	PrevPkScript []byte
+	Privk        *btcec.PrivateKey
+	NetParam     *chaincfg.Params
+	Data         []byte
+	IsSegWit     int
 }
 
 type Builder struct {
@@ -35,7 +35,7 @@ type Builder struct {
 	Tx           *wire.MsgTx
 	IsSigned     bool
 	Privks       map[string]*btcec.PrivateKey
-	IsSegWit int
+	IsSegWit     int
 }
 
 func NewBuilder(param *BuildCrossChainTxParam) (b *Builder, err error) {
