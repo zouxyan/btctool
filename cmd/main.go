@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/andlabs/ui"
 	_ "github.com/andlabs/ui/winmanifest"
+	"github.com/btcsuite/btcd/chaincfg"
 	"github.com/btcsuite/btcd/wire"
 	"github.com/ontio/multi-chain/common/log"
 	"github.com/zouxyan/btctool/service"
@@ -71,15 +72,16 @@ func init() {
 
 func main() {
 	flag.Parse()
-	log.InitLog(0, "./log/", os.Stdout)
 	quit := make(chan struct{})
 	if runGui == 1 {
+		log.InitLog(0, "./log/", os.Stdout)
 		startGui(quit)
 		select {
 		case <-quit:
 			return
 		}
 	}
+	log.InitLog(0, os.Stdout)
 	switch tool {
 	case "reg":
 		handler := &service.RegTxBuilder{
@@ -94,6 +96,7 @@ func main() {
 			ToChainId:    toChainId,
 			IsSegWit:     wit,
 			Redeem:       redeem,
+			NetParam:     &chaincfg.RegressionNetParams,
 		}
 		handler.Run()
 	case "test":
@@ -102,22 +105,40 @@ func main() {
 			log.Errorf("failed to get vals: %v", err)
 			os.Exit(1)
 		}
-
-		handler := service.TestTxBuilder{
-			OntAddr:      ontAddr,
-			Value:        value,
-			Fee:          fee,
-			Privkb58:     privkb58,
-			Indexes:      indexes,
-			SpvAddr:      spvAddr,
-			NetType:      netType,
-			Vals:         valArr,
-			Txids:        txids,
-			ContractAddr: contractAddr,
-			IsSegWit:     wit,
-			Redeem:       redeem,
+		if rpcUrl != "" {
+			handler := service.RegTxBuilder{
+				NetParam:     &chaincfg.TestNet3Params,
+				Privkb58:     privkb58,
+				Fee:          fee,
+				Value:        value,
+				OntAddr:      ontAddr,
+				Pwd:          pwd,
+				User:         user,
+				ContractAddr: contractAddr,
+				ToChainId:    toChainId,
+				IsSegWit:     wit,
+				Redeem:       redeem,
+				RpcUrl:       rpcUrl,
+			}
+			handler.Run()
+		} else {
+			handler := service.TestTxBuilder{
+				OntAddr:      ontAddr,
+				Value:        value,
+				Fee:          fee,
+				Privkb58:     privkb58,
+				Indexes:      indexes,
+				SpvAddr:      spvAddr,
+				NetType:      netType,
+				Vals:         valArr,
+				Txids:        txids,
+				ContractAddr: contractAddr,
+				IsSegWit:     wit,
+				Redeem:       redeem,
+				ToChainId:    toChainId,
+			}
+			handler.Run()
 		}
-		handler.Run()
 	case "blkgene":
 		handler := service.BlkGene{
 			User:        user,
@@ -178,129 +199,152 @@ func getVals(val string) ([]float64, error) {
 
 func startGui(quit chan struct{}) {
 	err := ui.Main(func() {
-		box1 := ui.NewVerticalBox()
-		formSelect := ui.NewForm()
-		combo := ui.NewCombobox()
-		combo.Append("构造本地私网跨链交易")
-		combo.Append("构造测试网跨链交易")
-		combo.SetSelected(1)
-		formSelect.Append("选择工具: ", combo, false)
-		box1.Append(formSelect, false)
+		paramTab := ui.NewTab()
+		yourTx := ui.NewMultilineEntry()
+		yourTx.SetReadOnly(true)
 
-		paramBox := ui.NewVerticalBox()
+		regParam := ui.NewForm()
 		fee := ui.NewEntry()
 		privkb58 := ui.NewEntry()
 		targetAddr := ui.NewEntry()
 		value := ui.NewEntry()
 		contract := ui.NewEntry()
 		toChainId := ui.NewEntry()
-		formParam := ui.NewForm()
-		formParam.Append("跨链BTC金额: ", value, false)
-		formParam.Append("目标链代币合约哈希: ", contract, false)
-		formParam.Append("目标链ID: ", toChainId, false)
-		formParam.Append("目标链地址: ", targetAddr, false)
-		formParam.Append("BTC交易手续费: ", fee, false)
-		formParam.Append("私钥(Base58): ", privkb58, false)
-		paramBox.Append(formParam, false)
-
 		pwd := ui.NewEntry()
 		user := ui.NewEntry()
 		url := ui.NewEntry()
-
-		index := ui.NewEntry()
-		utxoVals := ui.NewEntry()
-		txids := ui.NewEntry()
-
-		regG := ui.NewGroup("")
+		regParam.Append("跨链BTC金额: ", value, false)
+		regParam.Append("目标链代币合约哈希: ", contract, false)
+		regParam.Append("目标链ID: ", toChainId, false)
+		regParam.Append("目标链地址: ", targetAddr, false)
+		regParam.Append("BTC交易手续费: ", fee, false)
+		regParam.Append("私钥(Base58): ", privkb58, false)
+		regParam.Append("rpcURL: ", url, false)
+		regParam.Append("rpc用户: ", user, false)
+		regParam.Append("rpc密码: ", pwd, false)
+		buttonReg := ui.NewButton("获取交易")
+		rbbox := ui.NewHorizontalBox()
+		rbbox.Append(ui.NewLabel(""), true)
+		rbbox.Append(buttonReg, true)
+		rbbox.Append(ui.NewLabel(""), true)
 		regBox := ui.NewVerticalBox()
-		formRpc := ui.NewForm()
-		formRpc.Append("rpcURL: ", url, false)
-		formRpc.Append("rpc用户: ", user, false)
-		formRpc.Append("rpc密码: ", pwd, false)
-		regG.SetChild(formRpc)
-		regBox.Append(regG, false)
-		paramBox.Append(regBox, false)
-
-		testG := ui.NewGroup("")
-		cctxBox := ui.NewVerticalBox()
-		form := ui.NewForm()
-		form.Append("UTXO的index: ", index, false)
-		form.Append("UTXO的金额: ", utxoVals, false)
-		form.Append("UTXO的交易ID: ", txids, false)
-		testG.SetChild(form)
-		cctxBox.Append(testG, false)
-		paramBox.Append(cctxBox, false)
-
-		regBox.Hide()
-		var tool = "regauto"
-		combo.OnSelected(func(combobox *ui.Combobox) {
-			switch combo.Selected() {
-			case 0:
-				tool = "regauto"
-				regBox.Show()
-				cctxBox.Hide()
-			case 1:
-				tool = "cctx"
-				cctxBox.Show()
-				regBox.Hide()
-			case 2:
-				tool = "autosender"
-			default:
-				// log
-				fmt.Println(combo.Selected())
-			}
-		})
-
-		resultBox := ui.NewVerticalBox()
-		yourTx := ui.NewMultilineEntry()
-		yourTx.SetReadOnly(true)
-		button := ui.NewButton("获取交易")
-		button.OnClicked(func(button *ui.Button) {
+		regBox.Append(regParam, false)
+		regBox.Append(rbbox, false)
+		buttonReg.OnClicked(func(button *ui.Button) {
 			feeVal, err := strconv.ParseFloat(fee.Text(), 64)
 			if err != nil {
-				log.Errorf("failed to ")
-				os.Exit(1) //TODO: log it
+				log.Errorf("failed to parse float %s: %v", fee.Text(), err)
+				//TODO: log it
 			}
 			valueVal, err := strconv.ParseFloat(value.Text(), 64)
 			if err != nil {
 				log.Errorf("failed to parse value: %v", err)
-				os.Exit(1)
 			}
 			toChainIdVal, err := strconv.ParseUint(toChainId.Text(), 10, 64)
 			if err != nil {
 				log.Errorf("failed to parse tochain id: %v", err)
-				os.Exit(1)
 			}
 
-			switch tool {
-			case "regauto":
+			handler := &service.RegTxBuilder{
+				RpcUrl:       url.Text(),
+				Privkb58:     privkb58.Text(),
+				Fee:          feeVal,
+				Value:        valueVal,
+				OntAddr:      targetAddr.Text(),
+				Pwd:          pwd.Text(),
+				User:         user.Text(),
+				ContractAddr: contract.Text(),
+				ToChainId:    toChainIdVal,
+				IsSegWit:     0,
+				Redeem:       "5521023ac710e73e1410718530b2686ce47f12fa3c470a9eb6085976b70b01c64c9f732102c9dc4d8f419e325bbef0fe039ed6feaf2079a2ef7b27336ddb79be2ea6e334bf2102eac939f2f0873894d8bf0ef2f8bbdd32e4290cbf9632b59dee743529c0af9e802103378b4a3854c88cca8bfed2558e9875a144521df4a75ab37a206049ccef12be692103495a81957ce65e3359c114e6c2fe9f97568be491e3f24d6fa66cc542e360cd662102d43e29299971e802160a92cfcd4037e8ae83fb8f6af138684bebdc5686f3b9db21031e415c04cbc9b81fbee6e04d8c902e8f61109a2c9883a959ba528c52698c055a57ae",
+			}
+			yourTx.SetText("txid:\n" + handler.Run())
+		})
+
+		testParam := ui.NewForm()
+		feeT := ui.NewEntry()
+		privkb58T := ui.NewEntry()
+		targetAddrT := ui.NewEntry()
+		valueT := ui.NewEntry()
+		contractT := ui.NewEntry()
+		toChainIdT := ui.NewEntry()
+		index := ui.NewEntry()
+		utxoVals := ui.NewEntry()
+		txids := ui.NewEntry()
+		rpcPwd := ui.NewEntry()
+		rpcUser := ui.NewEntry()
+		rpcUrl := ui.NewEntry()
+
+		testParam.Append("跨链BTC金额: ", valueT, false)
+		testParam.Append("目标链代币合约哈希: ", contractT, false)
+		testParam.Append("目标链ID: ", toChainIdT, false)
+		testParam.Append("目标链地址: ", targetAddrT, false)
+		testParam.Append("BTC交易手续费: ", feeT, false)
+		testParam.Append("私钥(Base58): ", privkb58T, false)
+
+		utxoTab := ui.NewTab()
+		inputForm := ui.NewForm()
+		inputForm.Append("UTXO的index: ", index, false)
+		inputForm.Append("UTXO的金额: ", utxoVals, false)
+		inputForm.Append("UTXO的交易ID: ", txids, false)
+		utxoTab.Append("自行填写", inputForm)
+		byRpcForm := ui.NewForm()
+		byRpcForm.Append("全节点的URL: ", rpcUrl, false)
+		byRpcForm.Append("RPC用户名: ", rpcUser, false)
+		byRpcForm.Append("RPC密码: ", rpcPwd, false)
+		utxoTab.Append("RPC自动获取", byRpcForm)
+		testParam.Append("作为输入的UTXO:  \n\n", utxoTab, true)
+
+		buttonTest := ui.NewButton("获取交易")
+		hbox := ui.NewHorizontalBox()
+		hbox.Append(ui.NewLabel(""), true)
+		hbox.Append(buttonTest, true)
+		hbox.Append(ui.NewLabel(""), true)
+		testBox := ui.NewVerticalBox()
+		testBox.Append(testParam, false)
+		testBox.Append(hbox, false)
+		paramTab.Append("构造测试网跨链交易", testBox)
+		paramTab.Append("构造本地私网跨链交易", regBox)
+		buttonTest.OnClicked(func(button *ui.Button) {
+			feeVal, err := strconv.ParseFloat(feeT.Text(), 64)
+			if err != nil {
+				log.Errorf("failed to parse float %s: %v", fee.Text(), err)
+			}
+			valueVal, err := strconv.ParseFloat(valueT.Text(), 64)
+			if err != nil {
+				log.Errorf("failed to parse value: %v", err)
+			}
+			toChainIdVal, err := strconv.ParseUint(toChainIdT.Text(), 10, 64)
+			if err != nil {
+				log.Errorf("failed to parse tochain id: %v", err)
+			}
+			if rpcUrl.Text() != "" {
 				handler := &service.RegTxBuilder{
-					RpcUrl:       url.Text(),
-					Privkb58:     privkb58.Text(),
-					Fee:          feeVal,
-					Value:        valueVal,
-					OntAddr:      targetAddr.Text(),
-					Pwd:          pwd.Text(),
-					User:         user.Text(),
-					ContractAddr: contract.Text(),
+					NetParam:     &chaincfg.TestNet3Params,
 					ToChainId:    toChainIdVal,
-					IsSegWit:     0,
+					Value:        valueVal,
+					ContractAddr: contractT.Text(),
+					OntAddr:      targetAddrT.Text(),
 					Redeem:       "5521023ac710e73e1410718530b2686ce47f12fa3c470a9eb6085976b70b01c64c9f732102c9dc4d8f419e325bbef0fe039ed6feaf2079a2ef7b27336ddb79be2ea6e334bf2102eac939f2f0873894d8bf0ef2f8bbdd32e4290cbf9632b59dee743529c0af9e802103378b4a3854c88cca8bfed2558e9875a144521df4a75ab37a206049ccef12be692103495a81957ce65e3359c114e6c2fe9f97568be491e3f24d6fa66cc542e360cd662102d43e29299971e802160a92cfcd4037e8ae83fb8f6af138684bebdc5686f3b9db21031e415c04cbc9b81fbee6e04d8c902e8f61109a2c9883a959ba528c52698c055a57ae",
+					IsSegWit:     0,
+					Fee:          feeVal,
+					Privkb58:     privkb58T.Text(),
+					RpcUrl:       rpcUrl.Text(),
+					User:         rpcUser.Text(),
+					Pwd:          rpcPwd.Text(),
 				}
 				yourTx.SetText("txid:\n" + handler.Run())
-			case "cctx":
+			} else {
 				valArr, err := getVals(utxoVals.Text())
 				if err != nil {
 					log.Errorf("failed to get vals: %v", err)
-					os.Exit(1)
 				}
-
 				handler := &service.TestTxBuilder{
-					Privkb58:     privkb58.Text(),
+					Privkb58:     privkb58T.Text(),
 					Fee:          feeVal,
 					Value:        valueVal,
-					OntAddr:      targetAddr.Text(),
-					ContractAddr: contract.Text(),
+					OntAddr:      targetAddrT.Text(),
+					ContractAddr: contractT.Text(),
 					ToChainId:    toChainIdVal,
 					IsSegWit:     0,
 					Redeem:       "5521023ac710e73e1410718530b2686ce47f12fa3c470a9eb6085976b70b01c64c9f732102c9dc4d8f419e325bbef0fe039ed6feaf2079a2ef7b27336ddb79be2ea6e334bf2102eac939f2f0873894d8bf0ef2f8bbdd32e4290cbf9632b59dee743529c0af9e802103378b4a3854c88cca8bfed2558e9875a144521df4a75ab37a206049ccef12be692103495a81957ce65e3359c114e6c2fe9f97568be491e3f24d6fa66cc542e360cd662102d43e29299971e802160a92cfcd4037e8ae83fb8f6af138684bebdc5686f3b9db21031e415c04cbc9b81fbee6e04d8c902e8f61109a2c9883a959ba528c52698c055a57ae",
@@ -313,24 +357,19 @@ func startGui(quit chan struct{}) {
 				var buf bytes.Buffer
 				err = tx.BtcEncode(&buf, wire.ProtocolVersion, wire.LatestEncoding)
 				if err != nil {
-					fmt.Printf("%v\n", err)
+					log.Errorf("%v\n", err)
 				}
 				yourTx.SetText(fmt.Sprintf("you can use %s to broadcast tx: \n%s", "https://tbtc.bitaps.com/broadcast",
 					hex.EncodeToString(buf.Bytes())))
-			default:
-				os.Exit(1)
 			}
 		})
-		resultBox.Append(button, false)
+
+		resultBox := ui.NewVerticalBox()
 		resultBox.Append(ui.NewLabel("结果:"), true)
 		resultBox.Append(yourTx, false)
 
 		div := ui.NewVerticalBox()
-		div.Append(ui.NewLabel("-------------------首先，选择工具-------------------"), false)
-		div.Append(box1, false)
-		div.Append(ui.NewLabel("\n-------------------然后，填写参数-------------------"), false)
-		div.Append(paramBox, false)
-		div.Append(ui.NewLabel("\n-------------------最后，点击按钮构造交易-------------------"), false)
+		div.Append(paramTab, false)
 		div.Append(resultBox, true)
 		div.SetPadded(false)
 

@@ -214,6 +214,13 @@ func (cli *RestCli) ListUnspent(minConfs, maxConfs int64, addr string) ([]*Utxo,
 }
 
 func (cli *RestCli) ImportAddress(addr string) error {
+	info, err := cli.GetAddressInfo(addr)
+	if err != nil {
+		return err
+	}
+	if len(info["labels"].([]interface{})) != 0 {
+		return nil
+	}
 	req, err := json.Marshal(Request{
 		Jsonrpc: "1.0",
 		Method:  "importaddress",
@@ -233,6 +240,28 @@ func (cli *RestCli) ImportAddress(addr string) error {
 	}
 
 	return nil
+}
+
+func (cli *RestCli) GetAddressInfo(addr string) (map[string]interface{}, error) {
+	req, err := json.Marshal(Request{
+		Jsonrpc: "1.0",
+		Method:  "getaddressinfo",
+		Params:  []interface{}{addr},
+		Id:      1,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("[GetAddressInfo] failed to marshal request: %v", err)
+	}
+
+	resp, err := cli.sendPostReq(req)
+	if err != nil {
+		return nil, fmt.Errorf("[GetAddressInfo] failed to send post: %v", err)
+	}
+	if resp.Error != nil {
+		return nil, fmt.Errorf("[GetAddressInfo] response shows failure: %v", resp.Error.Message)
+	}
+
+	return resp.Result.(map[string]interface{}), nil
 }
 
 func (cli *RestCli) GetBlockCount() (int64, error) {

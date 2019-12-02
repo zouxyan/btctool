@@ -37,4 +37,6 @@ func TestSth(t *testing.T) {
 	aa = append(aa, bb...)
 	fmt.Printf("%v, cap(%d)\n", nil, cap(aa))
 	fmt.Println(math.Log2(float64(11264)))
+
+	fmt.Println(math.MaxInt64 >= btcutil.SatoshiPerBitcoin*21000000)
 }

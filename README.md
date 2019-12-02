@@ -14,15 +14,13 @@ go build -o btctool main.go
 
 ​	现在已经提供GUI版本的工具，请点击[下载](https://github.com/zouxyan/btctool/releases/download/0.1/btctool-macos)。
 
-​	下载GUI版本的工具后，双击之后显示如下。
+​	下载GUI版本的工具后，双击之后显示如下。在最上方选择功能，填入对应的信息，则可实现相应功能，发送跨链交易。
 
-<div align=center><img width="410" height="450" src="./doc/gui.png"/></div>
+<div align=center><img width="410" height="422" src="./doc/gui.png"/></div>
 
-1. 首先选择工具。现在支持比特币测试网和本地私网，测试网当前跨链生态测试中的一部分，发送交易后，可以在目标链测试网看到余额变化，如果是本地私网，则需要自行搭建联盟链、目标链等环境。选择后，参数会有变化，以下以测试网为例。
+1. 首先选择工具。现在支持比特币测试网和本地私网，比特币测试网包含在当前跨链生态测试中，发送交易后，可以在目标链测试网看到余额变化，如果是本地私网，则需要自行搭建联盟链、目标链等环境，可用作开发测试。选择后，参数会有变化，以下以测试网为例。
 
-   <div align=center><img width="430" height="60" src="./doc/sel.jpeg"/></div>
-
-2. 然后填写对应参数。如下表，测试网对应需要填入的参数，因为本工具没有实现钱包等复杂功能，所以UTXO的信息需要用户自行填入，可以使用测试网[浏览器](https://tbtc.bitaps.com/)查找自己地址的相关交易，找到未使用的输出即可。如果是私网，不需要指定UTXO，但需要配置节点的RPC信息。
+2. 然后填写对应参数。如下表，测试网对应需要填入的参数，因为本工具没有实现钱包等复杂功能，所以UTXO的信息需要用户自行填入，可以使用测试网[浏览器](https://tbtc.bitaps.com/)查找自己地址的相关交易，找到未使用的输出即可。如果是拥有测试网全节点或者是私网，不需要指定UTXO，但需要配置节点的RPC信息。
 
    | 参数               | 含义                                                         |
    | :----------------- | :----------------------------------------------------------- |
@@ -35,18 +33,20 @@ go build -o btctool main.go
    | UTXO的index        | 用户想使用的UTXO是前一笔交易的第几个输出，可以有多个，用逗号","隔开，如“0,2,2” |
    | UTXO的金额         | 用户要使用的UTXO的金额，可以有多个，用逗号","隔开，如“0.01,0.02,0.1” |
    | UTXO的交易ID       | UTXO的来源交易ID，可以有多个，用逗号","隔开                  |
+   | 全节点的URL        | 需要填比特币测试网全节点的RPC链接地址                        |
+   | RPC用户名          | 比特币全节点RPC用户名                                        |
+   | RPC密码            | 比特币全节点RPC密码                                          |
 
-   比如下图，向本体链测试网转移了1000聪BTC：
+   比如下图，向以太坊测试网转移了0.0001BTC，手续费设置为0.00001BTC，填入以太坊的BTC合约、在以太坊接收BTC的账户地址以及以太坊的ChainID，然后选择UTXO的获取方式，用户可以自行填写，也可以通过比特币全节点的RPC自动获取UTXO和发送交易：
 
-   <div align=center><img width="390" height="180" src="./doc/param.jpeg"/></div>
+   <div align=center><img width="430" height="180" src="./doc/param.png"/></div>
 
 3. 最后点击按钮，获得结果。测试网工具，会显示交易的十六进制字符串，用户只需复制字符串然后广播即可，私网则会通过参数中比特币全节点的RPC接口自动发送交易。比如：
 
-   <div align=center><img width="470" height="150" src="./doc/res.png"/></div>
-拷贝上图中十六进制字符串，使用该[工具](https://tbtc.bitaps.com/broadcast)广播交易，获得交易ID“[5dd77e5a4a65a856e474a7286017097dc81e8f887d11a1bf3f2889530e523060](https://tbtc.bitaps.com/5dd77e5a4a65a856e474a7286017097dc81e8f887d11a1bf3f2889530e523060)”如下图：
-   
-<div align=center><img width="580" height="150" src="./doc/broadcast.png"/></div>
+   <div align=center><img width="470" height="144" src="./doc/res.png"/></div>
 
+   拷贝上图中十六进制字符串，使用该[工具](https://tbtc.bitaps.com/broadcast)广播交易，获得交易ID“[de4eaa98252b24a1cd658f847c0a05083b6d03b4d5ad188f7cb62a808091ba8a](https://tbtc.bitaps.com/de4eaa98252b24a1cd658f847c0a05083b6d03b4d5ad188f7cb62a808091ba8a)”.
+   
 ## 命令行运行
 
 ​	btctool可以针对比特币测试网和本地仿真网络，如果使用跨链生态提供的测试网，那么btctool选择测试网即可，如果是在本地运行跨链测试网络，则选择仿真网络。
@@ -69,6 +69,7 @@ go build -o btctool main.go
 
 |    FLAGS    |                            USAGE                             |
 | :---------: | :----------------------------------------------------------: |
+|    -gui     |             是否以GUI的形式运行，1运行，0不运行              |
 |    -tool    |   选择对应的工具，cctx是测试网工具，regauto是仿真网络工具    |
 |   -idxes    | UTXO在交易中的位置，即第几个输出，例如0、1等，可多个，用","隔开 |
 |  -utxovals  |              每个UTXO的金额，可多个，用","隔开               |

@@ -13,7 +13,6 @@ import (
 	"github.com/ontio/multi-chain/common/log"
 	"github.com/zouxyan/btctool/builder"
 	"github.com/zouxyan/btctool/rest"
-	"os"
 )
 
 type RegTxBuilder struct {
@@ -28,35 +27,36 @@ type RegTxBuilder struct {
 	ToChainId    uint64
 	IsSegWit     int
 	Redeem       string
+	NetParam     *chaincfg.Params
 }
 
 func (ra *RegTxBuilder) Run() string {
 	if ra.OntAddr == "" {
 		log.Error("ont address is required")
-		os.Exit(1)
+		return ""
 	}
 	if ra.Privkb58 == "" {
 		log.Error("privk can't be null")
-		os.Exit(1)
+		return ""
 	}
 
 	privkey := base58.Decode(ra.Privkb58)
 	privk, pubk := btcec.PrivKeyFromBytes(btcec.S256(), privkey)
-	addrPubk, err := btcutil.NewAddressPubKey(pubk.SerializeCompressed(), &chaincfg.RegressionNetParams)
+	addrPubk, err := btcutil.NewAddressPubKey(pubk.SerializeCompressed(), ra.NetParam)
 	if err != nil {
 		log.Errorf("Failed to new an address pubkey: %v", err)
-		os.Exit(1)
+		return err.Error()
 	}
 	pubkScript, err := txscript.PayToAddrScript(addrPubk.AddressPubKeyHash())
 	if err != nil {
 		log.Errorf("Failed to build pubk script: %v", err)
-		os.Exit(1)
+		return err.Error()
 	}
 
 	data, err := buildData(ra.ToChainId, 0, ra.OntAddr, ra.ContractAddr)
 	if err != nil {
 		log.Errorf("Failed to ge data: %v", err)
-		os.Exit(1)
+		return err.Error()
 	}
 
 	cli := rest.NewRestCli(ra.RpcUrl, ra.User, ra.Pwd, "")
@@ -64,27 +64,27 @@ func (ra *RegTxBuilder) Run() string {
 	err = cli.ImportAddress(addr)
 	if err != nil {
 		log.Errorf("rpc failed: %v", err)
-		//os.Exit(1)
+		return err.Error()
 	}
 	cnt, err := cli.GetBlockCount()
 	if err != nil {
 		log.Errorf("rpc failed: %v", err)
-		//os.Exit(1)
+		return err.Error()
 	}
 	utxos, err := cli.ListUnspent(6, cnt, addr)
 	if err != nil {
 		log.Errorf("rpc failed: %v", err)
-		//os.Exit(1)
+		return err.Error()
 	}
 	total, err := btcutil.NewAmount(ra.Value + ra.Fee)
 	if err != nil {
 		log.Errorf("failed to new amount: %v", err)
-		//os.Exit(1)
+		return err.Error()
 	}
 	selected, sumVal, err := rest.SelectUtxos(utxos, int64(total))
 	if err != nil {
 		log.Errorf("failed to select utxo: %v", err)
-		//os.Exit(1)
+		return err.Error()
 	}
 
 	//var prevPkScripts [][]byte
@@ -94,19 +94,13 @@ func (ra *RegTxBuilder) Run() string {
 			Txid: v.Txid,
 			Vout: v.Vout,
 		})
-		//sb, err := hex.DecodeString(v.ScriptPubKey)
-		//if err != nil {
-		//	log.Errorf("failed to decode hex string pubk %s: %v", err)
-		//	os.Exit(1)
-		//}
-		//prevPkScripts = append(prevPkScripts, sb)
 	}
 
 	b, err := builder.NewBuilder(&builder.BuildCrossChainTxParam{
 		Redeem:       ra.Redeem,
 		Data:         data,
 		Inputs:       ipts,
-		NetParam:     &chaincfg.RegressionNetParams,
+		NetParam:     ra.NetParam,
 		PrevPkScript: pubkScript,
 		Privk:        privk,
 		Locktime:     nil,
@@ -122,38 +116,29 @@ func (ra *RegTxBuilder) Run() string {
 	})
 	if err != nil {
 		log.Errorf("Failed to new an instance of Builder: %v", err)
-		os.Exit(1)
+		return err.Error()
 	}
 
 	var buf bytes.Buffer
-	//if ra.Privkb58 == "" {
-	//	err = b.Tx.BtcEncode(&buf, wire.ProtocolVersion, wire.LatestEncoding)
-	//	if err != nil {
-	//		log.Errorf("Failed to encode transaction: %v", err)
-	//		os.Exit(1)
-	//	}
-	//	log.Infof("------------------------Your unsigned cross chain transaction------------------------\n%x\n", buf.Bytes())
-	//	return
-	//}
 	err = b.BuildSignedTx()
 	if err != nil || !b.IsSigned {
 		log.Errorf("Failed to build signed transaction: %v", err)
-		os.Exit(1)
+		return err.Error()
 	}
 	log.Infof("Signed cross chain transaction with your private key")
 	err = b.Tx.BtcEncode(&buf, wire.ProtocolVersion, wire.LatestEncoding)
 	if err != nil {
 		log.Errorf("Failed to encode transaction: %v", err)
-		os.Exit(1)
+		return err.Error()
 	}
 	log.Infof("------------------------Your signed cross chain transaction------------------------\n%x\n", buf.Bytes())
 
 	txid, err := cli.SendRawTx(hex.EncodeToString(buf.Bytes()))
 	if err != nil {
 		log.Errorf("failed to send tx: %v", err)
-		os.Exit(1)
+		return err.Error()
 	}
-	log.Infof("send tx %s to regression net", txid)
+	log.Infof("send tx %s to %s", txid, ra.NetParam.Name)
 
 	return txid
 }
