@@ -39,6 +39,7 @@ var maxVal int64
 var toChainId uint64
 var wit int
 var runGui int
+var alliaRpc string
 
 //only for test
 // TODO: use redeem to get these addresses
@@ -68,6 +69,7 @@ func init() {
 	flag.Uint64Var(&toChainId, "tochain", 2, "target chain id")
 	flag.IntVar(&wit, "wit", 0, "use segwit for output")
 	flag.IntVar(&runGui, "gui", 1, "run gui")
+	flag.StringVar(&alliaRpc, "allia-rpc", "", "alliance chain rpc address")
 }
 
 func main() {
@@ -100,11 +102,6 @@ func main() {
 		}
 		handler.Run()
 	case "test":
-		valArr, err := getVals(utxoVals)
-		if err != nil {
-			log.Errorf("failed to get vals: %v", err)
-			os.Exit(1)
-		}
 		if rpcUrl != "" {
 			handler := service.RegTxBuilder{
 				NetParam:     &chaincfg.TestNet3Params,
@@ -122,6 +119,11 @@ func main() {
 			}
 			handler.Run()
 		} else {
+			valArr, err := getVals(utxoVals)
+			if err != nil {
+				log.Errorf("failed to get vals: %v", err)
+				os.Exit(1)
+			}
 			handler := service.TestTxBuilder{
 				OntAddr:      ontAddr,
 				Value:        value,
@@ -174,6 +176,10 @@ func main() {
 			Dura:   dura,
 		}
 		handler.Run()
+	case "utxocounter":
+		service.CountAlliaUtxo(alliaRpc)
+	case "syncgh":
+
 	default:
 		log.Errorf("no handler matched")
 		os.Exit(1)

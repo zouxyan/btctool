@@ -85,7 +85,7 @@ func (builder *Builder) getUnsignedCrossChainTx(txIns []btcjson.TransactionInput
 	if locktime != nil && (*locktime < 0 || *locktime > int64(wire.MaxTxInSequenceNum)) {
 		return nil, fmt.Errorf("getRawTxToMultiAddr, locktime %d out of range", *locktime)
 	}
-	if value <= 0 || value > btcutil.MaxSatoshi {
+	if value < 0 || value > btcutil.MaxSatoshi {
 		return nil, fmt.Errorf("getRawTxToMultiAddr, wrong value to multi-addr: %f", value)
 	}
 

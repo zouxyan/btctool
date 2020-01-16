@@ -1,9 +1,10 @@
 package rest
 
 import (
+	"encoding/hex"
 	"fmt"
 	"github.com/btcsuite/btcutil"
-	"math"
+	"github.com/btcsuite/golangcrypto/ripemd160"
 	"testing"
 )
 
@@ -27,16 +28,8 @@ func TestSelectUtxos(t *testing.T) {
 }
 
 func TestSth(t *testing.T) {
-	aa := make([]int, 0)
-	fmt.Printf("%v, cap(%d)\n", aa, cap(aa))
-
-	aa = append(aa, 1, 2, 3)
-	fmt.Printf("%v, cap(%d)\n", aa, cap(aa))
-
-	bb := make([]int, 10241)
-	aa = append(aa, bb...)
-	fmt.Printf("%v, cap(%d)\n", nil, cap(aa))
-	fmt.Println(math.Log2(float64(11264)))
-
-	fmt.Println(math.MaxInt64 >= btcutil.SatoshiPerBitcoin*21000000)
+	bb, _ := hex.DecodeString("44978a77e4e983136bf1cca277c45e5bd4eff6a7848e900416daf86fd32c2743")
+	r := ripemd160.New()
+	r.Write(bb)
+	fmt.Println(hex.EncodeToString(r.Sum(nil)))
 }
