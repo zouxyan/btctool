@@ -66,7 +66,7 @@ func init() {
 	flag.StringVar(&contractAddr, "contract", "", "target chain smart contract address")
 	flag.Int64Var(&dura, "dura", 300, "set the seconds to send a cross-tx, default 5 min")
 	flag.Int64Var(&maxVal, "maxval", 2000, "the max value of cross tx")
-	flag.Uint64Var(&toChainId, "tochain", 2, "target chain id")
+	flag.Uint64Var(&toChainId, "tochain", 3, "target chain id")
 	flag.IntVar(&wit, "wit", 0, "use segwit for output")
 	flag.IntVar(&runGui, "gui", 1, "run gui")
 	flag.StringVar(&alliaRpc, "allia-rpc", "", "alliance chain rpc address")

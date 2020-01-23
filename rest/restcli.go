@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"github.com/btcsuite/btcd/btcjson"
 	"github.com/btcsuite/btcutil"
-	"github.com/ontio/btc-spvclient/rest/http/common"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -309,29 +308,29 @@ func (cli *RestCli) SendRawTx(rawTx string) (string, error) {
 }
 
 func (cli *RestCli) BroadcastTxBySpv(tx string) error {
-	if cli.SpvAddr == "" {
-		return fmt.Errorf("spv addr not set")
-	}
-	req, err := json.Marshal(common.BroadcastReq{
-		Tx: tx,
-	})
-	if err != nil {
-		return fmt.Errorf("[BroadcastTxBySpv] failed to marshal request: %v", err)
-	}
-
-	data, err := cli.SendRestRequestToSpv("http://"+cli.SpvAddr+"/api/v1/broadcasttx", req)
-	if err != nil {
-		return fmt.Errorf("Failed to send request: %v", err)
-	}
-
-	var resp common.Response
-	err = json.Unmarshal(data, &resp)
-	if err != nil {
-		return fmt.Errorf("Failed to unmarshal resp to json: %v", err)
-	}
-	if resp.Error != 0 || resp.Desc != "SUCCESS" {
-		return fmt.Errorf("Response shows failure: %s", resp.Desc)
-	}
+	//if cli.SpvAddr == "" {
+	//	return fmt.Errorf("spv addr not set")
+	//}
+	//req, err := json.Marshal(common.BroadcastReq{
+	//	Tx: tx,
+	//})
+	//if err != nil {
+	//	return fmt.Errorf("[BroadcastTxBySpv] failed to marshal request: %v", err)
+	//}
+	//
+	//data, err := cli.SendRestRequestToSpv("http://"+cli.SpvAddr+"/api/v1/broadcasttx", req)
+	//if err != nil {
+	//	return fmt.Errorf("Failed to send request: %v", err)
+	//}
+	//
+	//var resp common.Response
+	//err = json.Unmarshal(data, &resp)
+	//if err != nil {
+	//	return fmt.Errorf("Failed to unmarshal resp to json: %v", err)
+	//}
+	//if resp.Error != 0 || resp.Desc != "SUCCESS" {
+	//	return fmt.Errorf("Response shows failure: %s", resp.Desc)
+	//}
 
 	return nil
 }

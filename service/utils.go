@@ -14,7 +14,7 @@ func buildData(toChainId uint64, ccFee int64, toAddr, contractAddr string) ([]by
 	ccflag := byte(0x66)
 	var args *btc.Args
 	switch toChainId {
-	case 1:
+	case 2:
 		toAddr = strings.ReplaceAll(toAddr, "0x", "")
 		contractAddr = strings.ReplaceAll(contractAddr, "0x", "")
 
@@ -26,7 +26,7 @@ func buildData(toChainId uint64, ccFee int64, toAddr, contractAddr string) ([]by
 			Fee:               ccFee,
 			ToContractAddress: contract[:],
 		}
-	case 2:
+	case 3:
 		contractAddrBytes, err := common.AddressFromHexString(contractAddr)
 		if err != nil {
 			return nil, err

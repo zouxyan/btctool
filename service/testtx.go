@@ -72,7 +72,6 @@ func (cctx *TestTxBuilder) Run() *wire.MsgTx {
 		os.Exit(1)
 	}
 
-	fmt.Println(cctx.ToChainId, cctx.OntAddr, cctx.ContractAddr)
 	data, err := buildData(cctx.ToChainId, 0, cctx.OntAddr, cctx.ContractAddr)
 	if err != nil {
 		log.Errorf("failed to build data: %v", err)
