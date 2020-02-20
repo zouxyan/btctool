@@ -25,7 +25,7 @@ func (bg *BlkGene) Run() {
 		os.Exit(1)
 	}
 
-	cli := rest.NewRestCli(bg.RpcUrl, bg.User, bg.Pwd, "")
+	cli := rest.NewRestCli(bg.RpcUrl, bg.User, bg.Pwd)
 
 	tick := time.NewTicker(time.Duration(bg.Tsec) * time.Second)
 	for {

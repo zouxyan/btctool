@@ -1,8 +1,6 @@
 package builder
 
 import (
-	"crypto/sha256"
-	"encoding/hex"
 	"errors"
 	"fmt"
 	"github.com/btcsuite/btcd/btcec"
@@ -18,13 +16,12 @@ type BuildCrossChainTxParam struct {
 	Inputs       []btcjson.TransactionInput
 	Changes      map[string]float64 //pay to pubK
 	ToMultiValue float64
-	Redeem       string
+	ToAddr       string
 	Locktime     *int64
 	PrevPkScript []byte
 	Privk        *btcec.PrivateKey
 	NetParam     *chaincfg.Params
 	Data         []byte
-	IsSegWit     int
 }
 
 type Builder struct {
@@ -40,12 +37,11 @@ type Builder struct {
 
 func NewBuilder(param *BuildCrossChainTxParam) (b *Builder, err error) {
 	b = &Builder{}
-	b.IsSegWit = param.IsSegWit
 	b.NetParam = param.NetParam
 	b.PrivKey = param.Privk
 	b.PrevPkScript = param.PrevPkScript
 
-	mtx, err := b.getUnsignedCrossChainTx(param.Inputs, param.Changes, param.Redeem, param.ToMultiValue,
+	mtx, err := b.getUnsignedCrossChainTx(param.Inputs, param.Changes, param.ToAddr, param.ToMultiValue,
 		param.Locktime, param.NetParam, param.Data)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to get raw tx: %v", err)
@@ -80,7 +76,7 @@ func (builder *Builder) BuildSignedTx() error {
 }
 
 // need to make a multisig-output tx
-func (builder *Builder) getUnsignedCrossChainTx(txIns []btcjson.TransactionInput, changes map[string]float64, redeem string,
+func (builder *Builder) getUnsignedCrossChainTx(txIns []btcjson.TransactionInput, changes map[string]float64, toAddr string,
 	value float64, locktime *int64, netParam *chaincfg.Params, data []byte) (*wire.MsgTx, error) {
 	if locktime != nil && (*locktime < 0 || *locktime > int64(wire.MaxTxInSequenceNum)) {
 		return nil, fmt.Errorf("getRawTxToMultiAddr, locktime %d out of range", *locktime)
@@ -111,30 +107,13 @@ func (builder *Builder) getUnsignedCrossChainTx(txIns []btcjson.TransactionInput
 		return nil, fmt.Errorf("getRawTxToMultiAddr, failed to convert value: %v", err)
 	}
 
-	var addr btcutil.Address
-	rb, err := hex.DecodeString(redeem)
+	ta, err := btcutil.DecodeAddress(toAddr, netParam)
 	if err != nil {
-		return nil, fmt.Errorf("getRawTxToMultiAddr, failed to decode redeem hex: %v", err)
+		return nil, fmt.Errorf("getRawTxToMultiAddr, failed to decode to addr: %v", err)
 	}
-	fmt.Println("wit", builder.IsSegWit)
-	if builder.IsSegWit == 1 {
-		hasher := sha256.New()
-		hasher.Write(rb)
-
-		addr, err = btcutil.NewAddressWitnessScriptHash(hasher.Sum(nil), builder.NetParam)
-		if err != nil {
-			return nil, fmt.Errorf("failed to new witness address: %v", err)
-		}
-	} else {
-		addr, err = btcutil.NewAddressScriptHash(rb, builder.NetParam)
-		if err != nil {
-			return nil, fmt.Errorf("failed to new p2sh addr: %v", err)
-		}
-	}
-
-	s, err := txscript.PayToAddrScript(addr)
+	s, err := txscript.PayToAddrScript(ta)
 	if err != nil {
-		return nil, fmt.Errorf("getRawTxToMultiAddr, failed to get p2sh script: %v", err)
+		return nil, fmt.Errorf("getRawTxToMultiAddr, failed to get pkscript: %v", err)
 	}
 
 	mtx.AddTxOut(wire.NewTxOut(int64(valueInSatoshi), s))

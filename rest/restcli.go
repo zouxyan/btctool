@@ -29,11 +29,10 @@ type Response struct {
 // Get tx in block; Get proof;
 type RestCli struct {
 	Addr    string
-	SpvAddr string
 	Cli     *http.Client
 }
 
-func NewRestCli(addr, user, pwd, spvAddr string) *RestCli {
+func NewRestCli(addr, user, pwd string) *RestCli {
 	return &RestCli{
 		Cli: &http.Client{
 			Transport: &http.Transport{
@@ -50,7 +49,6 @@ func NewRestCli(addr, user, pwd, spvAddr string) *RestCli {
 			Timeout: time.Second * 300,
 		},
 		Addr:    addr,
-		SpvAddr: spvAddr,
 	}
 }
 

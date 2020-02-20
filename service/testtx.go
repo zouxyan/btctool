@@ -2,18 +2,13 @@ package service
 
 import (
 	"bytes"
-	"encoding/hex"
-	"fmt"
-	"github.com/btcsuite/btcd/btcec"
 	"github.com/btcsuite/btcd/btcjson"
 	"github.com/btcsuite/btcd/chaincfg"
 	"github.com/btcsuite/btcd/txscript"
 	"github.com/btcsuite/btcd/wire"
 	"github.com/btcsuite/btcutil"
-	"github.com/btcsuite/btcutil/base58"
 	"github.com/ontio/ontology/common/log"
 	"github.com/zouxyan/btctool/builder"
-	"github.com/zouxyan/btctool/rest"
 	"os"
 	"strconv"
 	"strings"
@@ -26,12 +21,10 @@ type TestTxBuilder struct {
 	Privkb58     string
 	Value        float64
 	Fee          float64
-	SpvAddr      string
 	NetType      string
 	Vals         []float64
 	ContractAddr string
-	Redeem       string
-	IsSegWit     int
+	ToAddr       string
 	ToChainId    uint64
 }
 
@@ -59,9 +52,13 @@ func (cctx *TestTxBuilder) Run() *wire.MsgTx {
 			return nil
 		}
 	}(cctx.NetType)
-	privkey := base58.Decode(cctx.Privkb58)
-	privk, pubk := btcec.PrivKeyFromBytes(btcec.S256(), privkey)
-	addrPubk, err := btcutil.NewAddressPubKey(pubk.SerializeCompressed(), net)
+
+	privk, err := btcutil.DecodeWIF(cctx.Privkb58)
+	if err != nil {
+		log.Fatalf("failed to decode your wif privk %s: %v", err)
+		os.Exit(1)
+	}
+	addrPubk, err := btcutil.NewAddressPubKey(privk.PrivKey.PubKey().SerializeCompressed(), net)
 	if err != nil {
 		log.Errorf("Failed to new an address pubkey: %v", err)
 		os.Exit(1)
@@ -121,7 +118,7 @@ func (cctx *TestTxBuilder) Run() *wire.MsgTx {
 		Inputs:       ipts,
 		NetParam:     net,
 		PrevPkScript: pubkScript,
-		Privk:        privk,
+		Privk:        privk.PrivKey,
 		Locktime:     nil,
 		ToMultiValue: cctx.Value,
 		Changes: func() map[string]float64 {
@@ -131,8 +128,7 @@ func (cctx *TestTxBuilder) Run() *wire.MsgTx {
 				return map[string]float64{}
 			}
 		}(),
-		Redeem:   cctx.Redeem,
-		IsSegWit: cctx.IsSegWit,
+		ToAddr: cctx.ToAddr,
 	})
 	if err != nil {
 		log.Errorf("Failed to new an instance of Builder: %v", err)
@@ -160,18 +156,6 @@ func (cctx *TestTxBuilder) Run() *wire.MsgTx {
 		os.Exit(1)
 	}
 	log.Infof("------------------------Your signed cross chain transaction------------------------\n%x\n", buf.Bytes())
-
-	if cctx.SpvAddr == "" {
-		log.Infof("spv addr not set, you need to broadcast tx by yourself")
-		return b.Tx
-	}
-
-	cli := rest.NewRestCli("", "", "", cctx.SpvAddr)
-	err = cli.BroadcastTxBySpv(hex.EncodeToString(buf.Bytes()))
-	if err != nil {
-		log.Errorf("failed to broadcast tx: %v", err)
-	}
-	log.Infof("and already broadcast tx %s", b.Tx.TxHash().String())
-
+	log.Infof("you need to broadcast tx by yourself")
 	return b.Tx
 }

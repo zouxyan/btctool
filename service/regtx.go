@@ -3,13 +3,11 @@ package service
 import (
 	"bytes"
 	"encoding/hex"
-	"github.com/btcsuite/btcd/btcec"
 	"github.com/btcsuite/btcd/btcjson"
 	"github.com/btcsuite/btcd/chaincfg"
 	"github.com/btcsuite/btcd/txscript"
 	"github.com/btcsuite/btcd/wire"
 	"github.com/btcsuite/btcutil"
-	"github.com/btcsuite/btcutil/base58"
 	"github.com/ontio/multi-chain/common/log"
 	"github.com/zouxyan/btctool/builder"
 	"github.com/zouxyan/btctool/rest"
@@ -25,8 +23,7 @@ type RegTxBuilder struct {
 	Pwd          string
 	ContractAddr string
 	ToChainId    uint64
-	IsSegWit     int
-	Redeem       string
+	ToAddr       string
 	NetParam     *chaincfg.Params
 }
 
@@ -40,9 +37,12 @@ func (ra *RegTxBuilder) Run() string {
 		return ""
 	}
 
-	privkey := base58.Decode(ra.Privkb58)
-	privk, pubk := btcec.PrivKeyFromBytes(btcec.S256(), privkey)
-	addrPubk, err := btcutil.NewAddressPubKey(pubk.SerializeCompressed(), ra.NetParam)
+	privk, err := btcutil.DecodeWIF(ra.Privkb58)
+	if err != nil {
+		log.Fatalf("failed to decode your wif privk %s: %v", err)
+		return err.Error()
+	}
+	addrPubk, err := btcutil.NewAddressPubKey(privk.PrivKey.PubKey().SerializeCompressed(), ra.NetParam)
 	if err != nil {
 		log.Errorf("Failed to new an address pubkey: %v", err)
 		return err.Error()
@@ -59,7 +59,7 @@ func (ra *RegTxBuilder) Run() string {
 		return err.Error()
 	}
 
-	cli := rest.NewRestCli(ra.RpcUrl, ra.User, ra.Pwd, "")
+	cli := rest.NewRestCli(ra.RpcUrl, ra.User, ra.Pwd)
 	addr := addrPubk.EncodeAddress()
 	err = cli.ImportAddress(addr)
 	if err != nil {
@@ -97,12 +97,11 @@ func (ra *RegTxBuilder) Run() string {
 	}
 
 	b, err := builder.NewBuilder(&builder.BuildCrossChainTxParam{
-		Redeem:       ra.Redeem,
 		Data:         data,
 		Inputs:       ipts,
 		NetParam:     ra.NetParam,
 		PrevPkScript: pubkScript,
-		Privk:        privk,
+		Privk:        privk.PrivKey,
 		Locktime:     nil,
 		ToMultiValue: ra.Value,
 		Changes: func() map[string]float64 {
@@ -112,7 +111,7 @@ func (ra *RegTxBuilder) Run() string {
 				return map[string]float64{}
 			}
 		}(),
-		IsSegWit: ra.IsSegWit,
+		ToAddr: ra.ToAddr,
 	})
 	if err != nil {
 		log.Errorf("Failed to new an instance of Builder: %v", err)
