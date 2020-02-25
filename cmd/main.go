@@ -46,6 +46,8 @@ var walletPwd string
 var contractId uint64
 var multiAddr string
 var btcPrivPwd string
+var pubks string
+var req int
 
 //only for test
 // TODO: use redeem to get these addresses
@@ -81,6 +83,8 @@ func init() {
 	flag.Uint64Var(&contractId, "contractId", 2, "chain id of your contract")
 	flag.StringVar(&multiAddr, "multiaddr", "", "multisign-addr of redeem")
 	flag.StringVar(&btcPrivPwd, "btcpwd", "", "password for btc privk encryption")
+	flag.StringVar(&pubks, "pubks", "", "public keys to create redeem-script")
+	flag.IntVar(&req, "require", 0, "require number for redeem")
 }
 
 func main() {
@@ -192,6 +196,11 @@ func main() {
 		service.EncryptBtcPrivk(privkb58, btcPrivPwd)
 	case "test1":
 		service.Test(alliaRpc, wallet, walletPwd)
+	case "getprivk":
+		log.Infof("your privk in WIF is %s", service.GetPrivk(netType))
+	case "getredeem":
+		log.Infof(service.GetRedeemForMultiSig(pubks, netType, req))
+
 	default:
 		log.Errorf("no handler matched")
 		os.Exit(1)
@@ -469,11 +478,50 @@ func startGui(quit chan struct{}) {
 			privkForEnc.SetText("")
 		})
 
+		//get private key
+		pParam := ui.NewForm()
+		netEntry := ui.NewEntry()
+		pParam.Append("比特币网络类型：", netEntry, false)
+		pButton := ui.NewButton("获取")
+		pBox := ui.NewHorizontalBox()
+		pBox.Append(ui.NewLabel(""), true)
+		pBox.Append(pButton, true)
+		pBox.Append(ui.NewLabel(""), true)
+		privBox := ui.NewVerticalBox()
+		privBox.Append(pParam, false)
+		privBox.Append(pBox, false)
+		pButton.OnClicked(func(button *ui.Button) {
+			yourTx.SetText(service.GetPrivk(netEntry.Text()))
+		})
+
+		//get redeem
+		rParam := ui.NewForm()
+		rnetEntry := ui.NewEntry()
+		pubksEntry := ui.NewEntry()
+		reqEntry := ui.NewEntry()
+		rParam.Append("比特币网络类型：", rnetEntry, false)
+		rParam.Append("公钥：", pubksEntry, false)
+		rParam.Append("要求签名数目：", reqEntry, false)
+		rButton := ui.NewButton("获取")
+		rBox := ui.NewHorizontalBox()
+		rBox.Append(ui.NewLabel(""), true)
+		rBox.Append(rButton, true)
+		rBox.Append(ui.NewLabel(""), true)
+		pubksBox := ui.NewVerticalBox()
+		pubksBox.Append(rParam, false)
+		pubksBox.Append(rBox, false)
+		rButton.OnClicked(func(button *ui.Button) {
+			reqNum, _ := strconv.ParseInt(reqEntry.Text(), 10, 64)
+			yourTx.SetText(service.GetRedeemForMultiSig(pubksEntry.Text(), rnetEntry.Text(), int(reqNum)))
+		})
+
 		paramTab.Append("测试网", testBox)
 		paramTab.Append("本地私网", regBox)
 		paramTab.Append("为合约签名", signBox)
 		paramTab.Append("注册多签合约", registerBox)
 		paramTab.Append("加密私钥", encBox)
+		paramTab.Append("生成私钥", privBox)
+		paramTab.Append("生成多签Redeem", pubksBox)
 
 		resultBox := ui.NewVerticalBox()
 		resultBox.Append(ui.NewLabel("结果:"), true)
@@ -484,7 +532,7 @@ func startGui(quit chan struct{}) {
 		div.Append(resultBox, true)
 		div.SetPadded(false)
 
-		window := ui.NewWindow("比特币跨链交易构造工具", 600, 600, false)
+		window := ui.NewWindow("比特币跨链交易构造工具", 900, 600, false)
 		window.SetChild(div)
 		window.SetMargined(true)
 		window.OnClosing(func(*ui.Window) bool {
