@@ -1,6 +1,7 @@
 package service
 
 import (
+	"encoding/binary"
 	"encoding/hex"
 	"github.com/btcsuite/btcutil"
 	"github.com/ontio/btc-spvclient/utils"
@@ -49,7 +50,7 @@ func RedeemRegister(alliaRpc, contractAddr, redeem, sigs, walletFile, pwd string
 	return txHash.ToHexString()
 }
 
-func GetSigForRedeemContract(contract, redeem, privk string) string {
+func GetSigForRedeemContract(contract, redeem, privk string, cver uint64) string {
 	r, err := hex.DecodeString(redeem)
 	if err != nil {
 		log.Fatalf("failed to decode redeem: %v", err)
@@ -61,8 +62,10 @@ func GetSigForRedeemContract(contract, redeem, privk string) string {
 		log.Fatalf("failed to decode contract: %v", err)
 		os.Exit(1)
 	}
+	cverBytes := make([]byte, 8)
+	binary.BigEndian.PutUint64(cverBytes, cver)
 
-	hash := btcutil.Hash160(append(r, c...))
+	hash := btcutil.Hash160(append(append(r, c...), cverBytes...))
 	wif, err := btcutil.DecodeWIF(privk)
 	if err != nil {
 		log.Fatalf("failed to decode wif: %v", err)

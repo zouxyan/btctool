@@ -9,34 +9,25 @@ import (
 	"strings"
 )
 
-func buildData(toChainId uint64, ccFee int64, toAddr, contractAddr string) ([]byte, error) {
+func buildData(toChainId uint64, ccFee int64, toAddr string) ([]byte, error) {
 	var data []byte
 	ccflag := byte(0x66)
 	var args *btc.Args
 	switch toChainId {
 	case 2:
 		toAddr = strings.ReplaceAll(toAddr, "0x", "")
-		contractAddr = strings.ReplaceAll(contractAddr, "0x", "")
-
 		toAddrBytes, _ := hex.DecodeString(toAddr)
-		contract, _ := hex.DecodeString(contractAddr)
 		args = &btc.Args{
 			Address:           toAddrBytes[:],
 			ToChainID:         toChainId,
 			Fee:               ccFee,
-			ToContractAddress: contract[:],
 		}
 	case 3:
-		contractAddrBytes, err := common.AddressFromHexString(contractAddr)
-		if err != nil {
-			return nil, err
-		}
 		addrBytes, _ := common.AddressFromBase58(toAddr)
 		args = &btc.Args{
 			Address:           addrBytes[:],
 			ToChainID:         toChainId,
 			Fee:               ccFee,
-			ToContractAddress: contractAddrBytes[:],
 		}
 	}
 	var buf []byte

@@ -23,7 +23,6 @@ type TestTxBuilder struct {
 	Fee          float64
 	NetType      string
 	Vals         []float64
-	ContractAddr string
 	ToAddr       string
 	ToChainId    uint64
 }
@@ -35,10 +34,6 @@ func (cctx *TestTxBuilder) Run() *wire.MsgTx {
 	}
 	if cctx.NetType != "main" && cctx.NetType != "test" {
 		log.Errorf("net type is not right: %s", cctx.NetType)
-		os.Exit(1)
-	}
-	if cctx.ContractAddr == "" {
-		log.Error("contract address can't be null")
 		os.Exit(1)
 	}
 
@@ -69,7 +64,7 @@ func (cctx *TestTxBuilder) Run() *wire.MsgTx {
 		os.Exit(1)
 	}
 
-	data, err := buildData(cctx.ToChainId, 0, cctx.OntAddr, cctx.ContractAddr)
+	data, err := buildData(cctx.ToChainId, 0, cctx.OntAddr)
 	if err != nil {
 		log.Errorf("failed to build data: %v", err)
 		os.Exit(1)

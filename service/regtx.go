@@ -21,7 +21,6 @@ type RegTxBuilder struct {
 	RpcUrl       string
 	User         string
 	Pwd          string
-	ContractAddr string
 	ToChainId    uint64
 	ToAddr       string
 	NetParam     *chaincfg.Params
@@ -53,7 +52,7 @@ func (ra *RegTxBuilder) Run() string {
 		return err.Error()
 	}
 
-	data, err := buildData(ra.ToChainId, 0, ra.OntAddr, ra.ContractAddr)
+	data, err := buildData(ra.ToChainId, 0, ra.OntAddr)
 	if err != nil {
 		log.Errorf("Failed to ge data: %v", err)
 		return err.Error()
