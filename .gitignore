@@ -1,5 +1,5 @@
 .idea/
 log/
-btctool
+btctool*
 wallet.dat
 btcprivk
