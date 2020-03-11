@@ -40,7 +40,7 @@ func StartGui(quit chan struct{}) {
 		div.Append(resultBox, true)
 		div.SetPadded(false)
 
-		window := ui.NewWindow("比特币跨链交易构造工具", 900, 600, false)
+		window := ui.NewWindow("比特币跨链交易构造工具", 1000, 600, false)
 		window.SetChild(div)
 		window.SetMargined(true)
 		window.OnClosing(func(*ui.Window) bool {

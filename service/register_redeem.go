@@ -42,7 +42,7 @@ func RedeemRegister(alliaRpc, contractAddr, redeem, sigs, walletFile, pwd string
 		os.Exit(1)
 	}
 
-	txHash, err := allia.Native.Scm.RegisterRedeem(1, contractId, cver, r, c, sigArr, acct)
+	txHash, err := allia.Native.Scm.RegisterRedeem(1, contractId, r, c, cver, sigArr, acct)
 	if err != nil {
 		log.Fatalf("failed to register: %v", err)
 		os.Exit(1)

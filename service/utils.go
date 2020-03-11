@@ -11,7 +11,7 @@ import (
 
 func buildData(toChainId uint64, ccFee int64, toAddr string) ([]byte, error) {
 	var data []byte
-	ccflag := byte(0x66)
+	ccflag := byte(0xcc)
 	var args *btc.Args
 	switch toChainId {
 	case 2:
