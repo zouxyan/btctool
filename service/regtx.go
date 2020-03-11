@@ -14,16 +14,16 @@ import (
 )
 
 type RegTxBuilder struct {
-	Fee          float64
-	Value        float64
-	Privkb58     string
-	OntAddr      string
-	RpcUrl       string
-	User         string
-	Pwd          string
-	ToChainId    uint64
-	ToAddr       string
-	NetParam     *chaincfg.Params
+	Fee       float64
+	Value     float64
+	Privkb58  string
+	OntAddr   string
+	RpcUrl    string
+	User      string
+	Pwd       string
+	ToChainId uint64
+	ToAddr    string
+	NetParam  *chaincfg.Params
 }
 
 func (ra *RegTxBuilder) Run() string {

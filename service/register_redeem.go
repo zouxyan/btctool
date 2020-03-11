@@ -135,21 +135,3 @@ func GetSigForBtcTxParam(fr, mc, pver uint64, redeem, privk string) string {
 	log.Infof("your sig is %s", res)
 	return res
 }
-
-func Test(alliaRpc, walletFile, pwd string) string {
-	allia := sdk.NewMultiChainSdk()
-	allia.NewRpcClient().SetAddress(alliaRpc)
-	acct, err := utils.GetAccountByPassword(allia, walletFile, pwd)
-	if err != nil {
-		log.Fatalf("failed to get account: %v", err)
-		os.Exit(1)
-	}
-	txHash, err := allia.Native.Scm.RegisterSideChain("123", 997, 997, "TEST", 100, acct)
-	if err != nil {
-		log.Fatal(err)
-		os.Exit(1)
-	}
-
-	log.Infof("successful to register call, tx hash is %s", txHash.ToHexString())
-	return txHash.ToHexString()
-}

@@ -18,16 +18,16 @@ func buildData(toChainId uint64, ccFee int64, toAddr string) ([]byte, error) {
 		toAddr = strings.ReplaceAll(toAddr, "0x", "")
 		toAddrBytes, _ := hex.DecodeString(toAddr)
 		args = &btc.Args{
-			Address:           toAddrBytes[:],
-			ToChainID:         toChainId,
-			Fee:               ccFee,
+			Address:   toAddrBytes[:],
+			ToChainID: toChainId,
+			Fee:       ccFee,
 		}
 	case 3:
 		addrBytes, _ := common.AddressFromBase58(toAddr)
 		args = &btc.Args{
-			Address:           addrBytes[:],
-			ToChainID:         toChainId,
-			Fee:               ccFee,
+			Address:   addrBytes[:],
+			ToChainID: toChainId,
+			Fee:       ccFee,
 		}
 	}
 	var buf []byte

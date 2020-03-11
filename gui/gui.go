@@ -11,27 +11,29 @@ import (
 	"github.com/zouxyan/btctool/service"
 	"strconv"
 	"strings"
+	"time"
 )
 
 func StartGui(quit chan struct{}) {
 	err := ui.Main(func() {
 		paramTab := ui.NewTab()
-		yourTx := ui.NewMultilineEntry()
-		yourTx.SetReadOnly(true)
 
-		paramTab.Append("测试网", GetBoxForTest(yourTx))
-		paramTab.Append("本地私网", GetBoxForReg(yourTx))
-		paramTab.Append("为合约签名", GetBoxForSignRedeemContract(yourTx))
-		paramTab.Append("注册多签合约", GetBoxForRegisterRedeem(yourTx))
-		paramTab.Append("为交易参数签名", GetBoxForSignTxParam(yourTx))
-		paramTab.Append("设置交易参数", GetBoxForSetTxParam(yourTx))
-		paramTab.Append("加密私钥", GetBoxForEncryptPrivk(yourTx))
-		paramTab.Append("生成私钥", GetBoxForGenePrivk(yourTx))
-		paramTab.Append("生成多签Redeem", GetBoxForGeneRedeem(yourTx))
-
+		res := ui.NewMultilineEntry()
+		res.SetReadOnly(true)
 		resultBox := ui.NewVerticalBox()
 		resultBox.Append(ui.NewLabel("结果:"), true)
-		resultBox.Append(yourTx, false)
+		resultBox.Append(res, false)
+
+		paramTab.Append("测试网", GetBoxForTest(res))
+		paramTab.Append("本地私网", GetBoxForReg(res))
+		paramTab.Append("为合约签名", GetBoxForSignRedeemContract(res))
+		paramTab.Append("注册多签合约", GetBoxForRegisterRedeem(res))
+		paramTab.Append("为交易参数签名", GetBoxForSignTxParam(res))
+		paramTab.Append("设置交易参数", GetBoxForSetTxParam(res))
+		paramTab.Append("加密私钥", GetBoxForEncryptPrivk(res))
+		paramTab.Append("生成私钥", GetBoxForGenePrivk(res))
+		paramTab.Append("生成多签Redeem", GetBoxForGeneRedeem(res))
+		paramTab.Append("UTXO监测", GetBoxForUtxoMonitor(res))
 
 		div := ui.NewVerticalBox()
 		div.Append(paramTab, false)
@@ -56,8 +58,7 @@ func StartGui(quit chan struct{}) {
 	}
 }
 
-
-func GetBoxForReg(yourTx *ui.MultilineEntry) *ui.Box {
+func GetBoxForReg(res *ui.MultilineEntry) *ui.Box {
 	regParam := ui.NewForm()
 	fee := ui.NewEntry()
 	privkb58 := ui.NewEntry()
@@ -82,9 +83,11 @@ func GetBoxForReg(yourTx *ui.MultilineEntry) *ui.Box {
 	rbbox.Append(ui.NewLabel(""), true)
 	rbbox.Append(buttonReg, true)
 	rbbox.Append(ui.NewLabel(""), true)
+
 	regBox := ui.NewVerticalBox()
 	regBox.Append(regParam, false)
 	regBox.Append(rbbox, false)
+
 	buttonReg.OnClicked(func(button *ui.Button) {
 		feeVal, err := strconv.ParseFloat(fee.Text(), 64)
 		if err != nil {
@@ -101,25 +104,25 @@ func GetBoxForReg(yourTx *ui.MultilineEntry) *ui.Box {
 		}
 
 		handler := &service.RegTxBuilder{
-			RpcUrl:       url.Text(),
-			Privkb58:     privkb58.Text(),
-			Fee:          feeVal,
-			Value:        valueVal,
-			OntAddr:      targetAddr.Text(),
-			Pwd:          pwd.Text(),
-			User:         user.Text(),
-			ToChainId:    toChainIdVal,
-			ToAddr:       multiAddr.Text(),
-			NetParam:     &chaincfg.RegressionNetParams,
+			RpcUrl:    url.Text(),
+			Privkb58:  privkb58.Text(),
+			Fee:       feeVal,
+			Value:     valueVal,
+			OntAddr:   targetAddr.Text(),
+			Pwd:       pwd.Text(),
+			User:      user.Text(),
+			ToChainId: toChainIdVal,
+			ToAddr:    multiAddr.Text(),
+			NetParam:  &chaincfg.RegressionNetParams,
 		}
-		yourTx.SetText("txid:\n" + handler.Run())
+		res.SetText("txid:\n" + handler.Run())
 		privkb58.SetText("")
 	})
 
 	return regBox
 }
 
-func GetBoxForTest(yourTx *ui.MultilineEntry) *ui.Box {
+func GetBoxForTest(res *ui.MultilineEntry) *ui.Box {
 	testParam := ui.NewForm()
 	feeT := ui.NewEntry()
 	privkb58T := ui.NewEntry()
@@ -159,9 +162,11 @@ func GetBoxForTest(yourTx *ui.MultilineEntry) *ui.Box {
 	hbox.Append(ui.NewLabel(""), true)
 	hbox.Append(buttonTest, true)
 	hbox.Append(ui.NewLabel(""), true)
+
 	testBox := ui.NewVerticalBox()
 	testBox.Append(testParam, false)
 	testBox.Append(hbox, false)
+
 	buttonTest.OnClicked(func(button *ui.Button) {
 		feeVal, err := strconv.ParseFloat(feeT.Text(), 64)
 		if err != nil {
@@ -177,34 +182,34 @@ func GetBoxForTest(yourTx *ui.MultilineEntry) *ui.Box {
 		}
 		if rpcUrl.Text() != "" {
 			handler := &service.RegTxBuilder{
-				NetParam:     &chaincfg.TestNet3Params,
-				ToChainId:    toChainIdVal,
-				Value:        valueVal,
-				OntAddr:      targetAddrT.Text(),
-				ToAddr:       multiAddrT.Text(),
-				Fee:          feeVal,
-				Privkb58:     privkb58T.Text(),
-				RpcUrl:       rpcUrl.Text(),
-				User:         rpcUser.Text(),
-				Pwd:          rpcPwd.Text(),
+				NetParam:  &chaincfg.TestNet3Params,
+				ToChainId: toChainIdVal,
+				Value:     valueVal,
+				OntAddr:   targetAddrT.Text(),
+				ToAddr:    multiAddrT.Text(),
+				Fee:       feeVal,
+				Privkb58:  privkb58T.Text(),
+				RpcUrl:    rpcUrl.Text(),
+				User:      rpcUser.Text(),
+				Pwd:       rpcPwd.Text(),
 			}
-			yourTx.SetText("txid:\n" + handler.Run())
+			res.SetText("txid:\n" + handler.Run())
 		} else {
 			valArr, err := GetVals(utxoVals.Text())
 			if err != nil {
 				log.Errorf("failed to get vals: %v", err)
 			}
 			handler := &service.TestTxBuilder{
-				Privkb58:     privkb58T.Text(),
-				Fee:          feeVal,
-				Value:        valueVal,
-				OntAddr:      targetAddrT.Text(),
-				ToChainId:    toChainIdVal,
-				ToAddr:       multiAddrT.Text(),
-				NetType:      "test",
-				Indexes:      index.Text(),
-				Vals:         valArr,
-				Txids:        txids.Text(),
+				Privkb58:  privkb58T.Text(),
+				Fee:       feeVal,
+				Value:     valueVal,
+				OntAddr:   targetAddrT.Text(),
+				ToChainId: toChainIdVal,
+				ToAddr:    multiAddrT.Text(),
+				NetType:   "test",
+				Indexes:   index.Text(),
+				Vals:      valArr,
+				Txids:     txids.Text(),
 			}
 			tx := handler.Run()
 			var buf bytes.Buffer
@@ -212,7 +217,7 @@ func GetBoxForTest(yourTx *ui.MultilineEntry) *ui.Box {
 			if err != nil {
 				log.Errorf("%v\n", err)
 			}
-			yourTx.SetText(fmt.Sprintf("you can use %s to broadcast tx: \n%s", "https://tbtc.bitaps.com/broadcast",
+			res.SetText(fmt.Sprintf("you can use %s to broadcast tx: \n%s", "https://tbtc.bitaps.com/broadcast",
 				hex.EncodeToString(buf.Bytes())))
 			privkb58T.SetText("")
 		}
@@ -221,7 +226,7 @@ func GetBoxForTest(yourTx *ui.MultilineEntry) *ui.Box {
 	return testBox
 }
 
-func GetBoxForSignRedeemContract(yourTx *ui.MultilineEntry) *ui.Box {
+func GetBoxForSignRedeemContract(res *ui.MultilineEntry) *ui.Box {
 	signParam := ui.NewForm()
 	privk := ui.NewEntry()
 	contractAddr := ui.NewEntry()
@@ -238,9 +243,11 @@ func GetBoxForSignRedeemContract(yourTx *ui.MultilineEntry) *ui.Box {
 	bbox.Append(ui.NewLabel(""), true)
 	bbox.Append(buttonSign, true)
 	bbox.Append(ui.NewLabel(""), true)
+
 	signBox := ui.NewVerticalBox()
 	signBox.Append(signParam, false)
 	signBox.Append(bbox, false)
+
 	buttonSign.OnClicked(func(button *ui.Button) {
 		v, err := strconv.ParseUint(cver.Text(), 10, 64)
 		if err != nil {
@@ -253,13 +260,13 @@ func GetBoxForSignRedeemContract(yourTx *ui.MultilineEntry) *ui.Box {
 			return
 		}
 		yourSig := service.GetSigForRedeemContract(contractAddr.Text(), redeem.Text(), privk.Text(), v, cId)
-		yourTx.SetText(fmt.Sprintf("here is your sig, please remember it:\n%s", yourSig))
+		res.SetText(fmt.Sprintf("here is your sig, please remember it:\n%s", yourSig))
 		privk.SetText("")
 	})
 	return signBox
 }
 
-func GetBoxForRegisterRedeem(yourTx *ui.MultilineEntry) *ui.Box {
+func GetBoxForRegisterRedeem(res *ui.MultilineEntry) *ui.Box {
 	registerParam := ui.NewForm()
 	rpcAllia := ui.NewEntry()
 	ca := ui.NewEntry()
@@ -282,9 +289,11 @@ func GetBoxForRegisterRedeem(yourTx *ui.MultilineEntry) *ui.Box {
 	rbox.Append(ui.NewLabel(""), true)
 	rbox.Append(registerButton, true)
 	rbox.Append(ui.NewLabel(""), true)
+
 	registerBox := ui.NewVerticalBox()
 	registerBox.Append(registerParam, false)
 	registerBox.Append(rbox, false)
+
 	registerButton.OnClicked(func(button *ui.Button) {
 		cid, err := strconv.ParseUint(contractId.Text(), 10, 64)
 		if err != nil {
@@ -296,7 +305,7 @@ func GetBoxForRegisterRedeem(yourTx *ui.MultilineEntry) *ui.Box {
 			log.Fatalf("failed to get chain-id: %v", err)
 			return
 		}
-		yourTx.SetText(fmt.Sprintf("your register tx hash is %s",
+		res.SetText(fmt.Sprintf("your register tx hash is %s",
 			service.RedeemRegister(rpcAllia.Text(), ca.Text(), redeem1.Text(), sigs.Text(), walletFile.Text(),
 				wpwd.Text(), cid, cver)))
 	})
@@ -304,7 +313,7 @@ func GetBoxForRegisterRedeem(yourTx *ui.MultilineEntry) *ui.Box {
 	return registerBox
 }
 
-func GetBoxForSignTxParam(yourTx *ui.MultilineEntry) *ui.Box {
+func GetBoxForSignTxParam(res *ui.MultilineEntry) *ui.Box {
 	signParam := ui.NewForm()
 	privk := ui.NewEntry()
 	redeem := ui.NewEntry()
@@ -322,9 +331,11 @@ func GetBoxForSignTxParam(yourTx *ui.MultilineEntry) *ui.Box {
 	bbox.Append(ui.NewLabel(""), true)
 	bbox.Append(buttonSign, true)
 	bbox.Append(ui.NewLabel(""), true)
+
 	signBox := ui.NewVerticalBox()
 	signBox.Append(signParam, false)
 	signBox.Append(bbox, false)
+
 	buttonSign.OnClicked(func(button *ui.Button) {
 		fr, err := strconv.ParseUint(feeRate.Text(), 10, 64)
 		if err != nil {
@@ -342,13 +353,13 @@ func GetBoxForSignTxParam(yourTx *ui.MultilineEntry) *ui.Box {
 			return
 		}
 		yourSig := service.GetSigForBtcTxParam(fr, mc, pv, redeem.Text(), privk.Text())
-		yourTx.SetText(fmt.Sprintf("here is your sig, please remember it:\n%s", yourSig))
+		res.SetText(fmt.Sprintf("here is your sig, please remember it:\n%s", yourSig))
 		privk.SetText("")
 	})
 	return signBox
 }
 
-func GetBoxForSetTxParam(yourTx *ui.MultilineEntry) *ui.Box {
+func GetBoxForSetTxParam(res *ui.MultilineEntry) *ui.Box {
 	registerParam := ui.NewForm()
 	rpcAllia := ui.NewEntry()
 	redeem := ui.NewEntry()
@@ -371,9 +382,11 @@ func GetBoxForSetTxParam(yourTx *ui.MultilineEntry) *ui.Box {
 	rbox.Append(ui.NewLabel(""), true)
 	rbox.Append(registerButton, true)
 	rbox.Append(ui.NewLabel(""), true)
+
 	registerBox := ui.NewVerticalBox()
 	registerBox.Append(registerParam, false)
 	registerBox.Append(rbox, false)
+
 	registerButton.OnClicked(func(button *ui.Button) {
 		fr, err := strconv.ParseUint(feeRate.Text(), 10, 64)
 		if err != nil {
@@ -390,14 +403,14 @@ func GetBoxForSetTxParam(yourTx *ui.MultilineEntry) *ui.Box {
 			log.Fatalf("failed to get param version: %v", err)
 			return
 		}
-		yourTx.SetText(fmt.Sprintf("your tx hash is %s",
+		res.SetText(fmt.Sprintf("your tx hash is %s",
 			service.SetBtcTxParam(rpcAllia.Text(), redeem.Text(), sigs.Text(), walletFile.Text(), wpwd.Text(), fr, mc, pv)))
 	})
 
 	return registerBox
 }
 
-func GetBoxForEncryptPrivk(yourTx *ui.MultilineEntry) *ui.Box {
+func GetBoxForEncryptPrivk(res *ui.MultilineEntry) *ui.Box {
 	encryptParam := ui.NewForm()
 	privkForEnc := ui.NewEntry()
 	pwdForEnc := ui.NewPasswordEntry()
@@ -410,23 +423,25 @@ func GetBoxForEncryptPrivk(yourTx *ui.MultilineEntry) *ui.Box {
 	ebox.Append(ui.NewLabel(""), true)
 	ebox.Append(encButton, true)
 	ebox.Append(ui.NewLabel(""), true)
+
 	encBox := ui.NewVerticalBox()
 	encBox.Append(encryptParam, false)
 	encBox.Append(ebox, false)
+
 	encButton.OnClicked(func(button *ui.Button) {
 		pwd, pwd1 := pwdForEnc.Text(), onemore.Text()
 		if pwd != pwd1 {
-			yourTx.SetText("两次密码输入不同")
+			res.SetText("两次密码输入不同")
 			return
 		}
 		service.EncryptBtcPrivk(privkForEnc.Text(), pwd)
-		yourTx.SetText(fmt.Sprintf("you can find your wallet file at %s", service.BTCPRIVK_PATH))
+		res.SetText(fmt.Sprintf("you can find your wallet file at %s", service.BTCPRIVK_PATH))
 		privkForEnc.SetText("")
 	})
 	return encBox
 }
 
-func GetBoxForGenePrivk(yourTx *ui.MultilineEntry) *ui.Box {
+func GetBoxForGenePrivk(res *ui.MultilineEntry) *ui.Box {
 	pParam := ui.NewForm()
 	netEntry := ui.NewEntry()
 	pParam.Append("比特币网络类型：", netEntry, false)
@@ -435,16 +450,18 @@ func GetBoxForGenePrivk(yourTx *ui.MultilineEntry) *ui.Box {
 	pBox.Append(ui.NewLabel(""), true)
 	pBox.Append(pButton, true)
 	pBox.Append(ui.NewLabel(""), true)
+
 	privBox := ui.NewVerticalBox()
 	privBox.Append(pParam, false)
 	privBox.Append(pBox, false)
+
 	pButton.OnClicked(func(button *ui.Button) {
-		yourTx.SetText(service.GetPrivk(netEntry.Text()))
+		res.SetText(service.GetPrivk(netEntry.Text()))
 	})
 	return privBox
 }
 
-func GetBoxForGeneRedeem(yourTx *ui.MultilineEntry) *ui.Box {
+func GetBoxForGeneRedeem(res *ui.MultilineEntry) *ui.Box {
 	rParam := ui.NewForm()
 	rnetEntry := ui.NewEntry()
 	pubksEntry := ui.NewEntry()
@@ -457,14 +474,115 @@ func GetBoxForGeneRedeem(yourTx *ui.MultilineEntry) *ui.Box {
 	rBox.Append(ui.NewLabel(""), true)
 	rBox.Append(rButton, true)
 	rBox.Append(ui.NewLabel(""), true)
+
 	pubksBox := ui.NewVerticalBox()
 	pubksBox.Append(rParam, false)
 	pubksBox.Append(rBox, false)
+
 	rButton.OnClicked(func(button *ui.Button) {
 		reqNum, _ := strconv.ParseInt(reqEntry.Text(), 10, 64)
-		yourTx.SetText(service.GetRedeemForMultiSig(pubksEntry.Text(), rnetEntry.Text(), int(reqNum)))
+		res.SetText(service.GetRedeemForMultiSig(pubksEntry.Text(), rnetEntry.Text(), int(reqNum)))
 	})
 	return pubksBox
+}
+
+func GetBoxForUtxoMonitor(res *ui.MultilineEntry) *ui.Box {
+	param := ui.NewForm()
+	rpc := ui.NewEntry()
+	less := ui.NewEntry()
+	redeem := ui.NewEntry()
+	param.Append("联盟链RPC地址：", rpc, false)
+	param.Append("小额限制：", less, false)
+	param.Append("多签赎回脚本：", redeem, false)
+
+	status := ui.NewForm()
+	sum := ui.NewEntry()
+	sum.SetReadOnly(true)
+	total := ui.NewEntry()
+	total.SetReadOnly(true)
+	p2sh := ui.NewEntry()
+	p2sh.SetReadOnly(true)
+	p2wsh := ui.NewEntry()
+	p2wsh.SetReadOnly(true)
+	lc := ui.NewEntry()
+	lc.SetReadOnly(true)
+	fr := ui.NewEntry()
+	fr.SetReadOnly(true)
+	mc := ui.NewEntry()
+	mc.SetReadOnly(true)
+
+	status.Append("UTXO金额总和：", sum, false)
+	status.Append("UTXO总数：", total, false)
+	status.Append("P2SH格式UTXO数目：", p2sh, false)
+	status.Append("P2WSH格式UTXO数目：", p2wsh, false)
+	status.Append("小额UTXO数目：", lc, false)
+	status.Append("费率：", fr, false)
+	status.Append("最小找零：", mc, false)
+
+	start := ui.NewButton("启动监听")
+	stop := ui.NewButton("停止监听")
+	rBox := ui.NewHorizontalBox()
+	rBox.Append(ui.NewLabel(""), true)
+	rBox.Append(start, true)
+	rBox.Append(stop, true)
+	rBox.Append(ui.NewLabel(""), true)
+
+	quit := make(chan struct{})
+	start.OnClicked(func(button *ui.Button) {
+		if !button.Enabled() {
+			return
+		}
+		button.Disable()
+		lessPoint, err := strconv.ParseUint(less.Text(), 10, 64)
+		if err != nil {
+			res.SetText(fmt.Sprintf("小额限制错误：%v", err))
+			button.Enable()
+			return
+		}
+		r, err := hex.DecodeString(redeem.Text())
+		if err != nil {
+			res.SetText(fmt.Sprintf("多签赎回脚本错误：%v", err))
+			button.Enable()
+			return
+		}
+		m := service.NewUtxoMonitor(lessPoint, rpc.Text(), r)
+		go m.RunMonitor()
+		go func() {
+			tick := time.NewTicker(time.Second * 5)
+			for {
+				select {
+				case <-tick.C:
+					sum.SetText(fmt.Sprintf("%d sat", m.Status.Sum))
+					total.SetText(strconv.FormatUint(m.Status.Total, 10))
+					p2sh.SetText(fmt.Sprintf("%d(%.3f%%) sum: %d sat", m.Status.P2shNum,
+						100*float64(m.Status.P2shNum)/float64(m.Status.Total), m.Status.P2shSum))
+					p2wsh.SetText(fmt.Sprintf("%d(%.3f%%) sum: %d sat", m.Status.P2wshNum,
+						100*float64(m.Status.P2wshNum)/float64(m.Status.Total), m.Status.P2wshSum))
+					lc.SetText(strconv.FormatUint(m.Status.Less, 10))
+					fr.SetText(fmt.Sprintf("%d sat/byte", m.Status.FeeRate))
+					mc.SetText(fmt.Sprintf("%d sat", m.Status.MinChange))
+				case <-quit:
+					m.Close()
+					button.Enable()
+					return
+				}
+			}
+		}()
+		res.SetText("you can find all utxo in file ./your_utxo")
+	})
+	stop.OnClicked(func(button *ui.Button) {
+		if start.Enabled() {
+			return
+		}
+		quit <- struct{}{}
+	})
+
+	mBox := ui.NewVerticalBox()
+	mBox.Append(param, false)
+	mBox.Append(rBox, true)
+	mBox.Append(status, false)
+
+	return mBox
 }
 
 func GetVals(val string) ([]float64, error) {

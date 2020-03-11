@@ -103,31 +103,31 @@ func main() {
 	switch tool {
 	case "reg":
 		handler := &service.RegTxBuilder{
-			RpcUrl:       rpcUrl,
-			Privkb58:     privkb58,
-			Fee:          fee,
-			Value:        value,
-			OntAddr:      ontAddr,
-			Pwd:          pwd,
-			User:         user,
-			ToChainId:    toChainId,
-			ToAddr:       multiAddr,
-			NetParam:     &chaincfg.RegressionNetParams,
+			RpcUrl:    rpcUrl,
+			Privkb58:  privkb58,
+			Fee:       fee,
+			Value:     value,
+			OntAddr:   ontAddr,
+			Pwd:       pwd,
+			User:      user,
+			ToChainId: toChainId,
+			ToAddr:    multiAddr,
+			NetParam:  &chaincfg.RegressionNetParams,
 		}
 		handler.Run()
 	case "test":
 		if rpcUrl != "" {
 			handler := service.RegTxBuilder{
-				NetParam:     &chaincfg.TestNet3Params,
-				Privkb58:     privkb58,
-				Fee:          fee,
-				Value:        value,
-				OntAddr:      ontAddr,
-				Pwd:          pwd,
-				User:         user,
-				ToChainId:    toChainId,
-				ToAddr:       multiAddr,
-				RpcUrl:       rpcUrl,
+				NetParam:  &chaincfg.TestNet3Params,
+				Privkb58:  privkb58,
+				Fee:       fee,
+				Value:     value,
+				OntAddr:   ontAddr,
+				Pwd:       pwd,
+				User:      user,
+				ToChainId: toChainId,
+				ToAddr:    multiAddr,
+				RpcUrl:    rpcUrl,
 			}
 			handler.Run()
 		} else {
@@ -137,16 +137,16 @@ func main() {
 				os.Exit(1)
 			}
 			handler := service.TestTxBuilder{
-				OntAddr:      ontAddr,
-				Value:        value,
-				Fee:          fee,
-				Privkb58:     privkb58,
-				Indexes:      indexes,
-				NetType:      netType,
-				Vals:         valArr,
-				Txids:        txids,
-				ToAddr:       multiAddr,
-				ToChainId:    toChainId,
+				OntAddr:   ontAddr,
+				Value:     value,
+				Fee:       fee,
+				Privkb58:  privkb58,
+				Indexes:   indexes,
+				NetType:   netType,
+				Vals:      valArr,
+				Txids:     txids,
+				ToAddr:    multiAddr,
+				ToChainId: toChainId,
 			}
 			handler.Run()
 		}
@@ -168,15 +168,15 @@ func main() {
 
 		handler := service.AutoSender{
 			CcTx: &service.TestTxBuilder{
-				OntAddr:      ontAddr,
-				Value:        value,
-				Fee:          fee,
-				Privkb58:     privkb58,
-				Indexes:      indexes,
-				NetType:      netType,
-				Vals:         valArr,
-				Txids:        txids,
-				ToAddr:       multiAddr,
+				OntAddr:  ontAddr,
+				Value:    value,
+				Fee:      fee,
+				Privkb58: privkb58,
+				Indexes:  indexes,
+				NetType:  netType,
+				Vals:     valArr,
+				Txids:    txids,
+				ToAddr:   multiAddr,
 			},
 			MaxVal: maxVal,
 			Dura:   dura,
@@ -204,6 +204,3 @@ func main() {
 		os.Exit(1)
 	}
 }
-
-
-

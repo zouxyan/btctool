@@ -28,8 +28,8 @@ type Response struct {
 
 // Get tx in block; Get proof;
 type RestCli struct {
-	Addr    string
-	Cli     *http.Client
+	Addr string
+	Cli  *http.Client
 }
 
 func NewRestCli(addr, user, pwd string) *RestCli {
@@ -48,7 +48,7 @@ func NewRestCli(addr, user, pwd string) *RestCli {
 			},
 			Timeout: time.Second * 300,
 		},
-		Addr:    addr,
+		Addr: addr,
 	}
 }
 

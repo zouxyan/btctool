@@ -15,16 +15,16 @@ import (
 )
 
 type TestTxBuilder struct {
-	OntAddr      string
-	Txids        string
-	Indexes      string
-	Privkb58     string
-	Value        float64
-	Fee          float64
-	NetType      string
-	Vals         []float64
-	ToAddr       string
-	ToChainId    uint64
+	OntAddr   string
+	Txids     string
+	Indexes   string
+	Privkb58  string
+	Value     float64
+	Fee       float64
+	NetType   string
+	Vals      []float64
+	ToAddr    string
+	ToChainId uint64
 }
 
 func (cctx *TestTxBuilder) Run() *wire.MsgTx {

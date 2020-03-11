@@ -15,7 +15,7 @@ func TestBuildData(t *testing.T) {
 }
 
 func TestBlkGene_Run(t *testing.T) {
-	cli := rest.NewRestCli("http://172.168.3.77:18443", "test", "test", "")
+	cli := rest.NewRestCli("http://172.168.3.77:18443", "test", "test", "")4
 
 	for cnt := 10; cnt > 0; cnt-- {
 		hs, err := cli.GenerateToAddr(1, "mjEoyyCPsLzJ23xMX6Mti13zMyN36kzn57")
