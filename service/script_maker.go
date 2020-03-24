@@ -59,7 +59,6 @@ func GetRedeemForMultiSig(pubks, netType string, req int) string {
 		if err != nil {
 			return err.Error()
 		}
-
 		pkAddr, err := btcutil.NewAddressPubKey(p, net)
 		if err != nil {
 			return err.Error()
@@ -79,6 +78,8 @@ func GetRedeemForMultiSig(pubks, netType string, req int) string {
 	hasher := sha256.New()
 	hasher.Write(redeem)
 	p2wsh, err := btcutil.NewAddressWitnessScriptHash(hasher.Sum(nil), net)
-	return fmt.Sprintf("your redeem is %s\nyour P2SH address is %s\nyour P2WSH address is %s",
-		hex.EncodeToString(redeem), p2sh.EncodeAddress(), p2wsh.EncodeAddress())
+
+	return fmt.Sprintf("your redeem is %s\nyour P2SH address is %s\nyour P2WSH address is %s\nyour multisig " +
+		"redeem hash is %s", hex.EncodeToString(redeem), p2sh.EncodeAddress(), p2wsh.EncodeAddress(),
+		hex.EncodeToString(btcutil.Hash160(redeem)))
 }

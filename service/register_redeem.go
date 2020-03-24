@@ -6,9 +6,8 @@ import (
 	"github.com/ontio/btc-spvclient/utils"
 	sdk "github.com/ontio/multi-chain-go-sdk"
 	"github.com/ontio/multi-chain/common/log"
-	"github.com/ontio/multi-chain/native/service/cross_chain_manager/btc"
+	"github.com/ontio/multi-chain/native/service/governance/side_chain_manager"
 	mutils "github.com/ontio/multi-chain/native/service/utils"
-	"os"
 	"strings"
 )
 
@@ -19,7 +18,7 @@ func RedeemRegister(alliaRpc, contractAddr, redeem, sigs, walletFile, pwd string
 		sb, err := hex.DecodeString(s)
 		if err != nil {
 			log.Fatalf("failed to decode no.%d sig %s: %v", i, s, err)
-			os.Exit(1)
+			return "" 
 		}
 		sigArr[i] = sb
 	}
@@ -28,24 +27,24 @@ func RedeemRegister(alliaRpc, contractAddr, redeem, sigs, walletFile, pwd string
 	r, err := hex.DecodeString(redeem)
 	if err != nil {
 		log.Fatalf("failed to decode redeem: %v", err)
-		os.Exit(1)
+		return ""
 	}
 	contractAddr = strings.Replace(contractAddr, "0x", "", 1)
 	c, err := hex.DecodeString(contractAddr)
 	if err != nil {
 		log.Fatalf("failed to decode contract: %v", err)
-		os.Exit(1)
+		return ""
 	}
-	acct, err := utils.GetAccountByPassword(allia, walletFile, pwd)
+	acct, err := utils.GetAccountByPassword(allia, walletFile, []byte(pwd))
 	if err != nil {
 		log.Fatalf("failed to get account: %v", err)
-		os.Exit(1)
+		return ""
 	}
 
 	txHash, err := allia.Native.Scm.RegisterRedeem(1, contractId, r, c, cver, sigArr, acct)
 	if err != nil {
 		log.Fatalf("failed to register: %v", err)
-		os.Exit(1)
+		return ""
 	}
 	log.Infof("successful to register call, tx hash is %s", txHash.ToHexString())
 	return txHash.ToHexString()
@@ -55,23 +54,23 @@ func GetSigForRedeemContract(contract, redeem, privk string, cver, toChainId uin
 	r, err := hex.DecodeString(redeem)
 	if err != nil {
 		log.Fatalf("failed to decode redeem: %v", err)
-		os.Exit(1)
+		return ""
 	}
 	contract = strings.Replace(contract, "0x", "", 1)
 	c, err := hex.DecodeString(contract)
 	if err != nil {
 		log.Fatalf("failed to decode contract: %v", err)
-		os.Exit(1)
+		return ""
 	}
 
-	fromChainId := mutils.GetUint64Bytes(btc.BTC_CHAIN_ID)
+	fromChainId := mutils.GetUint64Bytes(side_chain_manager.BTC_CHAIN_ID)
 	toChainIdBytes := mutils.GetUint64Bytes(toChainId)
 	cverBytes := mutils.GetUint64Bytes(cver)
 	hash := btcutil.Hash160(append(append(append(append(r, fromChainId...), c...), toChainIdBytes...), cverBytes...))
 	wif, err := btcutil.DecodeWIF(privk)
 	if err != nil {
 		log.Fatalf("failed to decode wif: %v", err)
-		os.Exit(1)
+		return ""
 	}
 
 	sig, err := wif.PrivKey.Sign(hash)
@@ -87,7 +86,7 @@ func SetBtcTxParam(alliaRpc, redeem, sigs, walletFile, pwd string, fr, mc, pver 
 		sb, err := hex.DecodeString(s)
 		if err != nil {
 			log.Fatalf("failed to decode no.%d sig %s: %v", i, s, err)
-			os.Exit(1)
+			return ""
 		}
 		sigArr[i] = sb
 	}
@@ -96,19 +95,19 @@ func SetBtcTxParam(alliaRpc, redeem, sigs, walletFile, pwd string, fr, mc, pver 
 	r, err := hex.DecodeString(redeem)
 	if err != nil {
 		log.Fatalf("failed to decode redeem: %v", err)
-		os.Exit(1)
+		return ""
 	}
 
-	acct, err := utils.GetAccountByPassword(allia, walletFile, pwd)
+	acct, err := utils.GetAccountByPassword(allia, walletFile, []byte(pwd))
 	if err != nil {
 		log.Fatalf("failed to get account: %v", err)
-		os.Exit(1)
+		return ""
 	}
 
-	txHash, err := allia.Native.Scm.SetBtcTxParam(r, btc.BTC_CHAIN_ID, fr, mc, pver, sigArr, acct)
+	txHash, err := allia.Native.Scm.SetBtcTxParam(r, side_chain_manager.BTC_CHAIN_ID, fr, mc, pver, sigArr, acct)
 	if err != nil {
 		log.Fatalf("failed to set btc tx param: %v", err)
-		os.Exit(1)
+		return ""
 	}
 	log.Infof("successful to set btc tx param, tx hash is %s", txHash.ToHexString())
 	return txHash.ToHexString()
@@ -118,9 +117,9 @@ func GetSigForBtcTxParam(fr, mc, pver uint64, redeem, privk string) string {
 	r, err := hex.DecodeString(redeem)
 	if err != nil {
 		log.Fatalf("failed to decode redeem: %v", err)
-		os.Exit(1)
+		return ""
 	}
-	fromChainId := mutils.GetUint64Bytes(btc.BTC_CHAIN_ID)
+	fromChainId := mutils.GetUint64Bytes(side_chain_manager.BTC_CHAIN_ID)
 	frBytes := mutils.GetUint64Bytes(fr)
 	mcBytes := mutils.GetUint64Bytes(mc)
 	verBytes := mutils.GetUint64Bytes(pver)
@@ -128,7 +127,7 @@ func GetSigForBtcTxParam(fr, mc, pver uint64, redeem, privk string) string {
 	wif, err := btcutil.DecodeWIF(privk)
 	if err != nil {
 		log.Fatalf("failed to decode wif: %v", err)
-		os.Exit(1)
+		return ""
 	}
 	sig, err := wif.PrivKey.Sign(hash)
 	res := hex.EncodeToString(sig.Serialize())

@@ -7,7 +7,6 @@ import (
 	"github.com/ontio/ontology/account"
 	"github.com/ontio/ontology/core/types"
 	"log"
-	"os"
 )
 
 const (
@@ -19,13 +18,13 @@ func EncryptBtcPrivk(privk, pwd string) {
 	privk = ""
 	if err != nil {
 		log.Fatalf("failed to get privk from wif: %v", err)
-		os.Exit(1)
+		return
 	}
 
 	wallet, err := account.Open(BTCPRIVK_PATH)
 	if err != nil {
 		log.Fatalf("failed to open wallet: %v", err)
-		os.Exit(1)
+		return
 	}
 
 	pub := pri.Public()
@@ -34,7 +33,7 @@ func EncryptBtcPrivk(privk, pwd string) {
 	k, err := keypair.EncryptPrivateKey(pri, b58addr, []byte(pwd))
 	if err != nil {
 		log.Fatalf("failed to encrypt private key: %v", err)
-		os.Exit(1)
+		return
 	}
 
 	var accMeta account.AccountMetadata
@@ -52,7 +51,7 @@ func EncryptBtcPrivk(privk, pwd string) {
 	err = wallet.ImportAccount(&accMeta)
 	if err != nil {
 		log.Fatalf("failed to import account: %v", err)
-		os.Exit(1)
+		return
 	}
 	pwd = ""
 }
