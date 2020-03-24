@@ -8,6 +8,7 @@ import (
 	"github.com/ontio/multi-chain/common/log"
 	"github.com/ontio/multi-chain/native/service/governance/side_chain_manager"
 	mutils "github.com/ontio/multi-chain/native/service/utils"
+	"github.com/ontio/ontology/common"
 	"strings"
 )
 
@@ -30,11 +31,22 @@ func RedeemRegister(alliaRpc, contractAddr, redeem, sigs, walletFile, pwd string
 		return ""
 	}
 	contractAddr = strings.Replace(contractAddr, "0x", "", 1)
-	c, err := hex.DecodeString(contractAddr)
-	if err != nil {
-		log.Fatalf("failed to decode contract: %v", err)
-		return ""
+	var c []byte
+	if contractId == 3 {
+		addr, err := common.AddressFromHexString(contractAddr)
+		if err != nil {
+			log.Fatalf("")
+			return ""
+		}
+		c = addr[:]
+	} else {
+		c, err = hex.DecodeString(contractAddr)
+		if err != nil {
+			log.Fatalf("failed to decode contract: %v", err)
+			return ""
+		}
 	}
+
 	acct, err := utils.GetAccountByPassword(allia, walletFile, []byte(pwd))
 	if err != nil {
 		log.Fatalf("failed to get account: %v", err)
@@ -57,10 +69,20 @@ func GetSigForRedeemContract(contract, redeem, privk string, cver, toChainId uin
 		return ""
 	}
 	contract = strings.Replace(contract, "0x", "", 1)
-	c, err := hex.DecodeString(contract)
-	if err != nil {
-		log.Fatalf("failed to decode contract: %v", err)
-		return ""
+	var c []byte
+	if toChainId == 3 {
+		addr, err := common.AddressFromHexString(contract)
+		if err != nil {
+			log.Fatalf("")
+			return ""
+		}
+		c = addr[:]
+	} else {
+		c, err = hex.DecodeString(contract)
+		if err != nil {
+			log.Fatalf("failed to decode contract: %v", err)
+			return ""
+		}
 	}
 
 	fromChainId := mutils.GetUint64Bytes(side_chain_manager.BTC_CHAIN_ID)
