@@ -12,19 +12,19 @@ import (
 	"strings"
 )
 
-func RedeemRegister(alliaRpc, contractAddr, redeem, sigs, walletFile, pwd string, contractId, cver uint64) string {
+func RedeemRegister(polyRpc, contractAddr, redeem, sigs, walletFile, pwd string, contractId, cver uint64) string {
 	ss := strings.Split(sigs, ",")
 	sigArr := make([][]byte, len(ss))
 	for i, s := range ss {
 		sb, err := hex.DecodeString(s)
 		if err != nil {
 			log.Fatalf("failed to decode no.%d sig %s: %v", i, s, err)
-			return "" 
+			return ""
 		}
 		sigArr[i] = sb
 	}
-	allia := sdk.NewMultiChainSdk()
-	allia.NewRpcClient().SetAddress(alliaRpc)
+	poly := sdk.NewMultiChainSdk()
+	poly.NewRpcClient().SetAddress(polyRpc)
 	r, err := hex.DecodeString(redeem)
 	if err != nil {
 		log.Fatalf("failed to decode redeem: %v", err)
@@ -47,13 +47,13 @@ func RedeemRegister(alliaRpc, contractAddr, redeem, sigs, walletFile, pwd string
 		}
 	}
 
-	acct, err := utils.GetAccountByPassword(allia, walletFile, []byte(pwd))
+	acct, err := utils.GetAccountByPassword(poly, walletFile, []byte(pwd))
 	if err != nil {
 		log.Fatalf("failed to get account: %v", err)
 		return ""
 	}
 
-	txHash, err := allia.Native.Scm.RegisterRedeem(1, contractId, r, c, cver, sigArr, acct)
+	txHash, err := poly.Native.Scm.RegisterRedeem(1, contractId, r, c, cver, sigArr, acct)
 	if err != nil {
 		log.Fatalf("failed to register: %v", err)
 		return ""
@@ -101,7 +101,7 @@ func GetSigForRedeemContract(contract, redeem, privk string, cver, toChainId uin
 	return res
 }
 
-func SetBtcTxParam(alliaRpc, redeem, sigs, walletFile, pwd string, fr, mc, pver uint64) string {
+func SetBtcTxParam(polyRpc, redeem, sigs, walletFile, pwd string, fr, mc, pver uint64) string {
 	ss := strings.Split(sigs, ",")
 	sigArr := make([][]byte, len(ss))
 	for i, s := range ss {
@@ -112,21 +112,21 @@ func SetBtcTxParam(alliaRpc, redeem, sigs, walletFile, pwd string, fr, mc, pver 
 		}
 		sigArr[i] = sb
 	}
-	allia := sdk.NewMultiChainSdk()
-	allia.NewRpcClient().SetAddress(alliaRpc)
+	poly := sdk.NewMultiChainSdk()
+	poly.NewRpcClient().SetAddress(polyRpc)
 	r, err := hex.DecodeString(redeem)
 	if err != nil {
 		log.Fatalf("failed to decode redeem: %v", err)
 		return ""
 	}
 
-	acct, err := utils.GetAccountByPassword(allia, walletFile, []byte(pwd))
+	acct, err := utils.GetAccountByPassword(poly, walletFile, []byte(pwd))
 	if err != nil {
 		log.Fatalf("failed to get account: %v", err)
 		return ""
 	}
 
-	txHash, err := allia.Native.Scm.SetBtcTxParam(r, side_chain_manager.BTC_CHAIN_ID, fr, mc, pver, sigArr, acct)
+	txHash, err := poly.Native.Scm.SetBtcTxParam(r, side_chain_manager.BTC_CHAIN_ID, fr, mc, pver, sigArr, acct)
 	if err != nil {
 		log.Fatalf("failed to set btc tx param: %v", err)
 		return ""

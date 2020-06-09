@@ -8,11 +8,11 @@ import (
 	"github.com/ontio/multi-chain/native/service/utils"
 )
 
-func CountAlliaUtxo(rpcAddr string) {
-	allia := sdk.NewMultiChainSdk()
-	allia.NewRpcClient().SetAddress(rpcAddr)
+func CountPolyUtxo(rpcAddr string) {
+	poly := sdk.NewMultiChainSdk()
+	poly.NewRpcClient().SetAddress(rpcAddr)
 
-	store, err := allia.GetStorage(utils.CrossChainManagerContractAddress.ToHexString(),
+	store, err := poly.GetStorage(utils.CrossChainManagerContractAddress.ToHexString(),
 		append([]byte(btc.UTXOS), utils.GetUint64Bytes(0)...))
 	if err != nil {
 		log.Errorf("failed to get storage: %v", err)
@@ -31,5 +31,5 @@ func CountAlliaUtxo(rpcAddr string) {
 		sum += u.Value
 	}
 
-	log.Infof("sum of utxos in alliance is %d", sum)
+	log.Infof("sum of utxos in poly is %d", sum)
 }

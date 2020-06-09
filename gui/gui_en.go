@@ -251,7 +251,7 @@ func GetBoxForSignRedeemContractEN(res *ui.MultilineEntry) *ui.Box {
 
 func GetBoxForRegisterRedeemEN(res *ui.MultilineEntry) *ui.Box {
 	registerParam := ui.NewForm()
-	rpcAllia := ui.NewEntry()
+	rpcPoly := ui.NewEntry()
 	ca := ui.NewEntry()
 	cver := ui.NewEntry()
 	redeem1 := ui.NewEntry()
@@ -259,12 +259,12 @@ func GetBoxForRegisterRedeemEN(res *ui.MultilineEntry) *ui.Box {
 	walletFile := ui.NewEntry()
 	wpwd := ui.NewEntry()
 	contractId := ui.NewEntry()
-	registerParam.Append("ORChain RPC-URL：", rpcAllia, false)
+	registerParam.Append("poly RPC-URL：", rpcPoly, false)
 	registerParam.Append("SmartContract: ", ca, false)
 	registerParam.Append("Contract Version: ", cver, false)
 	registerParam.Append("Multisig Redeem：", redeem1, false)
 	registerParam.Append("Signatures：", sigs, false)
-	registerParam.Append("ORChain Wallet Path：", walletFile, false)
+	registerParam.Append("poly Wallet Path：", walletFile, false)
 	registerParam.Append("Wallet Password：", wpwd, false)
 	registerParam.Append("Target Chain ID：", contractId, false)
 	registerButton := ui.NewButton("Register")
@@ -289,7 +289,7 @@ func GetBoxForRegisterRedeemEN(res *ui.MultilineEntry) *ui.Box {
 			return
 		}
 		res.SetText(fmt.Sprintf("your register tx hash is %s",
-			service.RedeemRegister(rpcAllia.Text(), ca.Text(), redeem1.Text(), sigs.Text(), walletFile.Text(),
+			service.RedeemRegister(rpcPoly.Text(), ca.Text(), redeem1.Text(), sigs.Text(), walletFile.Text(),
 				wpwd.Text(), cid, cver)))
 	})
 
@@ -344,7 +344,7 @@ func GetBoxForSignTxParamEN(res *ui.MultilineEntry) *ui.Box {
 
 func GetBoxForSetTxParamEN(res *ui.MultilineEntry) *ui.Box {
 	registerParam := ui.NewForm()
-	rpcAllia := ui.NewEntry()
+	rpcPoly := ui.NewEntry()
 	redeem := ui.NewEntry()
 	pver := ui.NewEntry()
 	sigs := ui.NewEntry()
@@ -352,13 +352,13 @@ func GetBoxForSetTxParamEN(res *ui.MultilineEntry) *ui.Box {
 	minChange := ui.NewEntry()
 	walletFile := ui.NewEntry()
 	wpwd := ui.NewEntry()
-	registerParam.Append("ORChain RPC-URL：", rpcAllia, false)
+	registerParam.Append("poly RPC-URL：", rpcPoly, false)
 	registerParam.Append("Multisig Redeem：", redeem, false)
 	registerParam.Append("Param Version：", pver, false)
 	registerParam.Append("Signatures：", sigs, false)
 	registerParam.Append("Fee Rate（sat/byte）：", feeRate, false)
 	registerParam.Append("Min Change（sat）：", minChange, false)
-	registerParam.Append("ORChain Wallet Path：", walletFile, false)
+	registerParam.Append("poly Wallet Path：", walletFile, false)
 	registerParam.Append("Wallet Password：", wpwd, false)
 	registerButton := ui.NewButton("Register")
 	rbox := ui.NewHorizontalBox()
@@ -387,7 +387,7 @@ func GetBoxForSetTxParamEN(res *ui.MultilineEntry) *ui.Box {
 			return
 		}
 		res.SetText(fmt.Sprintf("your tx hash is %s",
-			service.SetBtcTxParam(rpcAllia.Text(), redeem.Text(), sigs.Text(), walletFile.Text(), wpwd.Text(), fr, mc, pv)))
+			service.SetBtcTxParam(rpcPoly.Text(), redeem.Text(), sigs.Text(), walletFile.Text(), wpwd.Text(), fr, mc, pv)))
 	})
 
 	return registerBox
@@ -474,7 +474,7 @@ func GetBoxForUtxoMonitorEN(res *ui.MultilineEntry) *ui.Box {
 	rpc := ui.NewEntry()
 	less := ui.NewEntry()
 	redeem := ui.NewEntry()
-	param.Append("ORChain RPC-URL：", rpc, false)
+	param.Append("poly RPC-URL：", rpc, false)
 	param.Append("Small Value UTXO Limit：", less, false)
 	param.Append("Multisig Redeem：", redeem, false)
 
@@ -567,4 +567,3 @@ func GetBoxForUtxoMonitorEN(res *ui.MultilineEntry) *ui.Box {
 
 	return mBox
 }
-

@@ -20,9 +20,9 @@ type UtxoStatus struct {
 	Sum        uint64
 	Total      uint64
 	P2shNum    uint64
-	P2shSum uint64
+	P2shSum    uint64
 	P2wshNum   uint64
-	P2wshSum uint64
+	P2wshSum   uint64
 	FeeRate    uint64
 	MinChange  uint64
 	Less       uint64
@@ -31,19 +31,19 @@ type UtxoStatus struct {
 
 type UtxoMonitor struct {
 	Status    *UtxoStatus
-	allia     *sdk.MultiChainSdk
+	poly     *sdk.MultiChainSdk
 	rk        []byte
 	lessPoint uint64
 	quit      chan struct{}
 }
 
 func NewUtxoMonitor(lp uint64, rpcAddr string, redeem []byte) *UtxoMonitor {
-	allia := sdk.NewMultiChainSdk()
-	allia.NewRpcClient().SetAddress(rpcAddr)
+	poly := sdk.NewMultiChainSdk()
+	poly.NewRpcClient().SetAddress(rpcAddr)
 	k := btcutil.Hash160(redeem)
 	return &UtxoMonitor{
 		Status:    &UtxoStatus{},
-		allia:     allia,
+		poly:     poly,
 		rk:        k,
 		lessPoint: lp,
 		quit:      make(chan struct{}),
@@ -58,7 +58,7 @@ func (m *UtxoMonitor) RunMonitor() {
 	for {
 		select {
 		case <-tick.C:
-			store, err := m.allia.GetStorage(utils.CrossChainManagerContractAddress.ToHexString(),
+			store, err := m.poly.GetStorage(utils.CrossChainManagerContractAddress.ToHexString(),
 				append(append([]byte(btc.UTXOS), utils.GetUint64Bytes(1)...), []byte(hex.EncodeToString(m.rk))...))
 			if err != nil {
 				log.Errorf("failed to get utxos from chain: %v", err)
@@ -88,7 +88,7 @@ func (m *UtxoMonitor) RunMonitor() {
 				content += fmt.Sprintf("No.%d (outpoint: %s, value: %d, script_type: %s)\n", i, v.Op.String(), v.Value,
 					cls.String())
 			}
-			store, err = m.allia.GetStorage(utils.SideChainManagerContractAddress.ToHexString(),
+			store, err = m.poly.GetStorage(utils.SideChainManagerContractAddress.ToHexString(),
 				append(append([]byte(side_chain_manager.BTC_TX_PARAM), m.rk...), utils.GetUint64Bytes(1)...))
 			if err != nil {
 				log.Errorf("failed to get btc tx param from chain: %v", err)

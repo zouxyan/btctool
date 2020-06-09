@@ -32,7 +32,7 @@ var maxVal int64
 var toChainId uint64
 var wit int
 var runGui int
-var alliaRpc string
+var polyRpc string
 var rdm string
 var sigs string
 var wallet string
@@ -71,7 +71,7 @@ func init() {
 	flag.Uint64Var(&toChainId, "tochain", 3, "target chain id")
 	flag.IntVar(&wit, "wit", 0, "use segwit for output")
 	flag.IntVar(&runGui, "gui", 1, "run gui")
-	flag.StringVar(&alliaRpc, "allia-rpc", "", "alliance chain rpc address")
+	flag.StringVar(&polyRpc, "poly-rpc", "", "poly chain rpc address")
 	flag.StringVar(&rdm, "redeem", "", "your redeem script")
 	flag.StringVar(&sigs, "sigs", "", "your sig for redeem register")
 	flag.StringVar(&wallet, "wallet", "", "OR chain wallet file path")
@@ -183,13 +183,13 @@ func main() {
 		}
 		handler.Run()
 	case "utxocounter":
-		service.CountAlliaUtxo(alliaRpc)
+		service.CountPolyUtxo(polyRpc)
 	case "register_redeem":
-		service.RedeemRegister(alliaRpc, contractAddr, rdm, sigs, wallet, walletPwd, contractId, cver)
+		service.RedeemRegister(polyRpc, contractAddr, rdm, sigs, wallet, walletPwd, contractId, cver)
 	case "sign_redeem_contract":
 		service.GetSigForRedeemContract(contractAddr, rdm, privkb58, cver, contractId)
 	case "set_tx_param":
-		service.SetBtcTxParam(alliaRpc, rdm, sigs, wallet, walletPwd, feeRate, minChange, pver)
+		service.SetBtcTxParam(polyRpc, rdm, sigs, wallet, walletPwd, feeRate, minChange, pver)
 	case "sign_tx_param":
 		service.GetSigForBtcTxParam(feeRate, minChange, pver, rdm, privkb58)
 	case "encrypt_privk":

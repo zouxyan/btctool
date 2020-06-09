@@ -2,6 +2,8 @@ package service
 
 import (
 	"encoding/hex"
+	"github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/gaia/x/ccm"
 	mcom "github.com/ontio/multi-chain/common"
 	"github.com/ontio/multi-chain/native/service/cross_chain_manager/btc"
 	"github.com/ontio/ontology/common"
@@ -26,6 +28,13 @@ func buildData(toChainId uint64, ccFee int64, toAddr string) ([]byte, error) {
 		addrBytes, _ := common.AddressFromBase58(toAddr)
 		args = &btc.Args{
 			Address:   addrBytes[:],
+			ToChainID: toChainId,
+			Fee:       ccFee,
+		}
+	case ccm.CurrentChainCrossChainId:
+		addr, _ := types.AccAddressFromBech32(toAddr)
+		args = &btc.Args{
+			Address:   addr[:],
 			ToChainID: toChainId,
 			Fee:       ccFee,
 		}

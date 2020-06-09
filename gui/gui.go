@@ -277,7 +277,7 @@ func GetBoxForSignRedeemContract(res *ui.MultilineEntry) *ui.Box {
 
 func GetBoxForRegisterRedeem(res *ui.MultilineEntry) *ui.Box {
 	registerParam := ui.NewForm()
-	rpcAllia := ui.NewEntry()
+	rpcPoly := ui.NewEntry()
 	ca := ui.NewEntry()
 	cver := ui.NewEntry()
 	redeem1 := ui.NewEntry()
@@ -285,12 +285,12 @@ func GetBoxForRegisterRedeem(res *ui.MultilineEntry) *ui.Box {
 	walletFile := ui.NewEntry()
 	wpwd := ui.NewEntry()
 	contractId := ui.NewEntry()
-	registerParam.Append("中继链RPC地址：", rpcAllia, false)
+	registerParam.Append("polyRPC地址：", rpcPoly, false)
 	registerParam.Append("目标合约", ca, false)
 	registerParam.Append("合约版本", cver, false)
 	registerParam.Append("多签Redeem：", redeem1, false)
 	registerParam.Append("签名：", sigs, false)
-	registerParam.Append("中继链钱包路径：", walletFile, false)
+	registerParam.Append("poly钱包路径：", walletFile, false)
 	registerParam.Append("钱包密码：", wpwd, false)
 	registerParam.Append("目标链ID：", contractId, false)
 	registerButton := ui.NewButton("注册")
@@ -315,7 +315,7 @@ func GetBoxForRegisterRedeem(res *ui.MultilineEntry) *ui.Box {
 			return
 		}
 		res.SetText(fmt.Sprintf("your register tx hash is %s",
-			service.RedeemRegister(rpcAllia.Text(), ca.Text(), redeem1.Text(), sigs.Text(), walletFile.Text(),
+			service.RedeemRegister(rpcPoly.Text(), ca.Text(), redeem1.Text(), sigs.Text(), walletFile.Text(),
 				wpwd.Text(), cid, cver)))
 	})
 
@@ -370,7 +370,7 @@ func GetBoxForSignTxParam(res *ui.MultilineEntry) *ui.Box {
 
 func GetBoxForSetTxParam(res *ui.MultilineEntry) *ui.Box {
 	registerParam := ui.NewForm()
-	rpcAllia := ui.NewEntry()
+	rpcPoly := ui.NewEntry()
 	redeem := ui.NewEntry()
 	pver := ui.NewEntry()
 	sigs := ui.NewEntry()
@@ -378,13 +378,13 @@ func GetBoxForSetTxParam(res *ui.MultilineEntry) *ui.Box {
 	minChange := ui.NewEntry()
 	walletFile := ui.NewEntry()
 	wpwd := ui.NewEntry()
-	registerParam.Append("中继链RPC地址：", rpcAllia, false)
+	registerParam.Append("polyRPC地址：", rpcPoly, false)
 	registerParam.Append("多签Redeem：", redeem, false)
 	registerParam.Append("参数版本：", pver, false)
 	registerParam.Append("签名：", sigs, false)
 	registerParam.Append("费率（sat/byte）：", feeRate, false)
 	registerParam.Append("最小找零值（sat）：", minChange, false)
-	registerParam.Append("中继链钱包路径：", walletFile, false)
+	registerParam.Append("poly钱包路径：", walletFile, false)
 	registerParam.Append("钱包密码：", wpwd, false)
 	registerButton := ui.NewButton("注册")
 	rbox := ui.NewHorizontalBox()
@@ -413,7 +413,7 @@ func GetBoxForSetTxParam(res *ui.MultilineEntry) *ui.Box {
 			return
 		}
 		res.SetText(fmt.Sprintf("your tx hash is %s",
-			service.SetBtcTxParam(rpcAllia.Text(), redeem.Text(), sigs.Text(), walletFile.Text(), wpwd.Text(), fr, mc, pv)))
+			service.SetBtcTxParam(rpcPoly.Text(), redeem.Text(), sigs.Text(), walletFile.Text(), wpwd.Text(), fr, mc, pv)))
 	})
 
 	return registerBox
@@ -500,7 +500,7 @@ func GetBoxForUtxoMonitor(res *ui.MultilineEntry) *ui.Box {
 	rpc := ui.NewEntry()
 	less := ui.NewEntry()
 	redeem := ui.NewEntry()
-	param.Append("中继链RPC地址：", rpc, false)
+	param.Append("polyRPC地址：", rpc, false)
 	param.Append("小额限制：", less, false)
 	param.Append("多签赎回脚本：", redeem, false)
 
