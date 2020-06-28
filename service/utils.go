@@ -2,6 +2,7 @@ package service
 
 import (
 	"encoding/hex"
+	"fmt"
 	"github.com/ConjurTech/switcheo-chain/cmd"
 	"github.com/cosmos/cosmos-sdk/types"
 	mcom "github.com/ontio/multi-chain/common"
@@ -30,6 +31,13 @@ func buildData(toChainId uint64, ccFee int64, toAddr string) ([]byte, error) {
 			ToChainID: toChainId,
 			Fee:       ccFee,
 		}
+	case 4:
+		addrBytes, _ := hex.DecodeString(toAddr)
+		args = &btc.Args{
+			Address:   addrBytes[:],
+			ToChainID: toChainId,
+			Fee:       ccFee,
+		}
 	case 5:
 		config := types.GetConfig()
 		config.SetBech32PrefixForAccount(types.Bech32PrefixAccAddr, types.Bech32PrefixAccPub)
@@ -41,7 +49,7 @@ func buildData(toChainId uint64, ccFee int64, toAddr string) ([]byte, error) {
 			ToChainID: toChainId,
 			Fee:       ccFee,
 		}
-	case 170:
+	case 172:
 		config := types.GetConfig()
 		config.SetBech32PrefixForAccount(cmd.MainPrefix, cmd.MainPrefix+types.PrefixPublic)
 		config.SetBech32PrefixForValidator(cmd.MainPrefix+types.PrefixValidator+types.PrefixOperator, cmd.MainPrefix+types.PrefixValidator+types.PrefixOperator+types.PrefixPublic)
@@ -52,6 +60,8 @@ func buildData(toChainId uint64, ccFee int64, toAddr string) ([]byte, error) {
 			ToChainID: toChainId,
 			Fee:       ccFee,
 		}
+	default:
+		return nil, fmt.Errorf("not supported chainid %d", toChainId)
 	}
 	var buf []byte
 	sink := mcom.NewZeroCopySink(buf)
