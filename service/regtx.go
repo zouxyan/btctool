@@ -8,7 +8,7 @@ import (
 	"github.com/btcsuite/btcd/txscript"
 	"github.com/btcsuite/btcd/wire"
 	"github.com/btcsuite/btcutil"
-	"github.com/ontio/multi-chain/common/log"
+	"github.com/polynetwork/poly/common/log"
 	"github.com/zouxyan/btctool/builder"
 	"github.com/zouxyan/btctool/rest"
 )

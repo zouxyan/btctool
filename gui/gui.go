@@ -7,7 +7,7 @@ import (
 	"github.com/andlabs/ui"
 	"github.com/btcsuite/btcd/chaincfg"
 	"github.com/btcsuite/btcd/wire"
-	"github.com/ontio/multi-chain/common/log"
+	"github.com/polynetwork/poly/common/log"
 	"github.com/zouxyan/btctool/service"
 	"strconv"
 	"strings"

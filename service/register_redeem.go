@@ -3,11 +3,11 @@ package service
 import (
 	"encoding/hex"
 	"github.com/btcsuite/btcutil"
-	"github.com/ontio/btc-spvclient/utils"
-	sdk "github.com/ontio/multi-chain-go-sdk"
-	"github.com/ontio/multi-chain/common/log"
-	"github.com/ontio/multi-chain/native/service/governance/side_chain_manager"
-	mutils "github.com/ontio/multi-chain/native/service/utils"
+	"github.com/polynetwork/vendortool/utils"
+	sdk "github.com/polynetwork/poly-go-sdk"
+	"github.com/polynetwork/poly/common/log"
+	"github.com/polynetwork/poly/native/service/governance/side_chain_manager"
+	mutils "github.com/polynetwork/poly/native/service/utils"
 	"github.com/ontio/ontology/common"
 	"strings"
 )
@@ -23,7 +23,7 @@ func RedeemRegister(polyRpc, contractAddr, redeem, sigs, walletFile, pwd string,
 		}
 		sigArr[i] = sb
 	}
-	poly := sdk.NewMultiChainSdk()
+	poly := sdk.NewPolySdk()
 	poly.NewRpcClient().SetAddress(polyRpc)
 	r, err := hex.DecodeString(redeem)
 	if err != nil {
@@ -112,7 +112,7 @@ func SetBtcTxParam(polyRpc, redeem, sigs, walletFile, pwd string, fr, mc, pver u
 		}
 		sigArr[i] = sb
 	}
-	poly := sdk.NewMultiChainSdk()
+	poly := sdk.NewPolySdk()
 	poly.NewRpcClient().SetAddress(polyRpc)
 	r, err := hex.DecodeString(redeem)
 	if err != nil {

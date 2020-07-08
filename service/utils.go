@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"github.com/ConjurTech/switcheo-chain/cmd"
 	"github.com/cosmos/cosmos-sdk/types"
-	mcom "github.com/ontio/multi-chain/common"
-	"github.com/ontio/multi-chain/native/service/cross_chain_manager/btc"
+	mcom "github.com/polynetwork/poly/common"
+	"github.com/polynetwork/poly/native/service/cross_chain_manager/btc"
 	"github.com/ontio/ontology/common"
 	"strings"
 )

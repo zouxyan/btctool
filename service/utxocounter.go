@@ -2,14 +2,14 @@ package service
 
 import (
 	"github.com/ontio/eth_tools/log"
-	sdk "github.com/ontio/multi-chain-go-sdk"
-	"github.com/ontio/multi-chain/common"
-	"github.com/ontio/multi-chain/native/service/cross_chain_manager/btc"
-	"github.com/ontio/multi-chain/native/service/utils"
+	sdk "github.com/polynetwork/poly-go-sdk"
+	"github.com/polynetwork/poly/common"
+	"github.com/polynetwork/poly/native/service/cross_chain_manager/btc"
+	"github.com/polynetwork/poly/native/service/utils"
 )
 
 func CountPolyUtxo(rpcAddr string) {
-	poly := sdk.NewMultiChainSdk()
+	poly := sdk.NewPolySdk()
 	poly.NewRpcClient().SetAddress(rpcAddr)
 
 	store, err := poly.GetStorage(utils.CrossChainManagerContractAddress.ToHexString(),

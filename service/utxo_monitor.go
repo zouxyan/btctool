@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"github.com/btcsuite/btcd/txscript"
 	"github.com/btcsuite/btcutil"
-	sdk "github.com/ontio/multi-chain-go-sdk"
-	"github.com/ontio/multi-chain/common"
-	"github.com/ontio/multi-chain/common/log"
-	"github.com/ontio/multi-chain/native/service/cross_chain_manager/btc"
-	"github.com/ontio/multi-chain/native/service/governance/side_chain_manager"
-	"github.com/ontio/multi-chain/native/service/utils"
+	sdk "github.com/polynetwork/poly-go-sdk"
+	"github.com/polynetwork/poly/common"
+	"github.com/polynetwork/poly/common/log"
+	"github.com/polynetwork/poly/native/service/cross_chain_manager/btc"
+	"github.com/polynetwork/poly/native/service/governance/side_chain_manager"
+	"github.com/polynetwork/poly/native/service/utils"
 	"io/ioutil"
 	"sort"
 	"time"
@@ -31,14 +31,14 @@ type UtxoStatus struct {
 
 type UtxoMonitor struct {
 	Status    *UtxoStatus
-	poly     *sdk.MultiChainSdk
+	poly     *sdk.PolySdk
 	rk        []byte
 	lessPoint uint64
 	quit      chan struct{}
 }
 
 func NewUtxoMonitor(lp uint64, rpcAddr string, redeem []byte) *UtxoMonitor {
-	poly := sdk.NewMultiChainSdk()
+	poly := sdk.NewPolySdk()
 	poly.NewRpcClient().SetAddress(rpcAddr)
 	k := btcutil.Hash160(redeem)
 	return &UtxoMonitor{

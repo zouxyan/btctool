@@ -4,7 +4,7 @@ import (
 	"flag"
 	_ "github.com/andlabs/ui/winmanifest"
 	"github.com/btcsuite/btcd/chaincfg"
-	"github.com/ontio/multi-chain/common/log"
+	"github.com/polynetwork/poly/common/log"
 	"github.com/zouxyan/btctool/gui"
 	"github.com/zouxyan/btctool/service"
 	"os"
