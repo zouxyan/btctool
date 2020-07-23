@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/ConjurTech/switcheo-chain/cmd"
 	"github.com/cosmos/cosmos-sdk/types"
+	"github.com/polynetwork/poly-go-sdk"
 	mcom "github.com/polynetwork/poly/common"
 	"github.com/polynetwork/poly/native/service/cross_chain_manager/btc"
 	"github.com/ontio/ontology/common"
@@ -73,4 +74,13 @@ func buildData(toChainId uint64, ccFee int64, toAddr string) ([]byte, error) {
 
 type Service interface {
 	Run()
+}
+
+func SetPolyChainId(poly *poly_go_sdk.PolySdk) error {
+	hdr, err := poly.GetHeaderByHeight(0)
+	if err != nil {
+		return err
+	}
+	poly.SetChainId(hdr.ChainID)
+	return nil
 }

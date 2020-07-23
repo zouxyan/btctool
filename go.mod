@@ -18,8 +18,8 @@ require (
 	github.com/ontio/go-bip32 v0.0.0-20190520025953-d3cea6894a2b // indirect
 	github.com/ontio/ontology v1.11.0
 	github.com/ontio/ontology-crypto v1.0.9
-	github.com/polynetwork/poly v0.0.0-00010101000000-000000000000
-	github.com/polynetwork/poly-go-sdk v0.0.0-00010101000000-000000000000
+	github.com/polynetwork/poly v0.0.0-20200715030435-4f1d1a0adb44
+	github.com/polynetwork/poly-go-sdk v0.0.0-20200722030827-6875b6018b93
 	github.com/polynetwork/vendortool v0.0.0-00010101000000-000000000000
 	github.com/skyinglyh1/cosmos-poly-module v0.0.0-20200611071020-364a883092be // indirect
 	golang.org/x/sys v0.0.0-20200615200032-f1bc736245b1 // indirect
@@ -31,7 +31,5 @@ replace (
 	github.com/ConjurTech/switcheo-chain => ../../ConjurTech/switcheo-chain
 	github.com/cosmos/gaia => github.com/skyinglyh1/gaia v1.0.1-0.20200608095633-f3d8a0b00305
 	github.com/ontio/eth_tools => ../../ontio/eth_tools
-	github.com/polynetwork/poly => ../../ontio/poly
-	github.com/polynetwork/poly-go-sdk => ../../ontio/poly-go-sdk
 	github.com/polynetwork/vendortool => ../../ontio/vendortool
 )

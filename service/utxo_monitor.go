@@ -40,6 +40,11 @@ type UtxoMonitor struct {
 func NewUtxoMonitor(lp uint64, rpcAddr string, redeem []byte) *UtxoMonitor {
 	poly := sdk.NewPolySdk()
 	poly.NewRpcClient().SetAddress(rpcAddr)
+	if err := SetPolyChainId(poly); err != nil {
+		log.Fatalf("failed to set poly chain id: %v", err)
+		return nil
+	}
+
 	k := btcutil.Hash160(redeem)
 	return &UtxoMonitor{
 		Status:    &UtxoStatus{},

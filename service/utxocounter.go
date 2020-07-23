@@ -11,6 +11,10 @@ import (
 func CountPolyUtxo(rpcAddr string) {
 	poly := sdk.NewPolySdk()
 	poly.NewRpcClient().SetAddress(rpcAddr)
+	if err := SetPolyChainId(poly); err != nil {
+		log.Errorf("failed to set poly chain id: %v", err)
+		return
+	}
 
 	store, err := poly.GetStorage(utils.CrossChainManagerContractAddress.ToHexString(),
 		append([]byte(btc.UTXOS), utils.GetUint64Bytes(0)...))

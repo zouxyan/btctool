@@ -3,12 +3,11 @@ package service
 import (
 	"encoding/hex"
 	"github.com/btcsuite/btcutil"
-	"github.com/polynetwork/vendortool/utils"
+	"github.com/ontio/ontology/common"
 	sdk "github.com/polynetwork/poly-go-sdk"
 	"github.com/polynetwork/poly/common/log"
-	"github.com/polynetwork/poly/native/service/governance/side_chain_manager"
 	mutils "github.com/polynetwork/poly/native/service/utils"
-	"github.com/ontio/ontology/common"
+	"github.com/polynetwork/vendortool/utils"
 	"strings"
 )
 
@@ -25,6 +24,10 @@ func RedeemRegister(polyRpc, contractAddr, redeem, sigs, walletFile, pwd string,
 	}
 	poly := sdk.NewPolySdk()
 	poly.NewRpcClient().SetAddress(polyRpc)
+	if err := SetPolyChainId(poly); err != nil {
+		log.Fatalf("failed to set poly chain id: %v", err)
+		return ""
+	}
 	r, err := hex.DecodeString(redeem)
 	if err != nil {
 		log.Fatalf("failed to decode redeem: %v", err)
@@ -85,7 +88,7 @@ func GetSigForRedeemContract(contract, redeem, privk string, cver, toChainId uin
 		}
 	}
 
-	fromChainId := mutils.GetUint64Bytes(side_chain_manager.BTC_CHAIN_ID)
+	fromChainId := mutils.GetUint64Bytes(1)
 	toChainIdBytes := mutils.GetUint64Bytes(toChainId)
 	cverBytes := mutils.GetUint64Bytes(cver)
 	hash := btcutil.Hash160(append(append(append(append(r, fromChainId...), c...), toChainIdBytes...), cverBytes...))
@@ -114,6 +117,10 @@ func SetBtcTxParam(polyRpc, redeem, sigs, walletFile, pwd string, fr, mc, pver u
 	}
 	poly := sdk.NewPolySdk()
 	poly.NewRpcClient().SetAddress(polyRpc)
+	if err := SetPolyChainId(poly); err != nil {
+		log.Fatalf("failed to set poly chain id: %v", err)
+		return ""
+	}
 	r, err := hex.DecodeString(redeem)
 	if err != nil {
 		log.Fatalf("failed to decode redeem: %v", err)
@@ -126,7 +133,7 @@ func SetBtcTxParam(polyRpc, redeem, sigs, walletFile, pwd string, fr, mc, pver u
 		return ""
 	}
 
-	txHash, err := poly.Native.Scm.SetBtcTxParam(r, side_chain_manager.BTC_CHAIN_ID, fr, mc, pver, sigArr, acct)
+	txHash, err := poly.Native.Scm.SetBtcTxParam(r, 1, fr, mc, pver, sigArr, acct)
 	if err != nil {
 		log.Fatalf("failed to set btc tx param: %v", err)
 		return ""
@@ -141,7 +148,7 @@ func GetSigForBtcTxParam(fr, mc, pver uint64, redeem, privk string) string {
 		log.Fatalf("failed to decode redeem: %v", err)
 		return ""
 	}
-	fromChainId := mutils.GetUint64Bytes(side_chain_manager.BTC_CHAIN_ID)
+	fromChainId := mutils.GetUint64Bytes(1)
 	frBytes := mutils.GetUint64Bytes(fr)
 	mcBytes := mutils.GetUint64Bytes(mc)
 	verBytes := mutils.GetUint64Bytes(pver)
