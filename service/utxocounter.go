@@ -1,7 +1,7 @@
 package service
 
 import (
-	"github.com/ontio/eth_tools/log"
+	"github.com/polynetwork/btc-vendor-tools/log"
 	sdk "github.com/polynetwork/poly-go-sdk"
 	"github.com/polynetwork/poly/common"
 	"github.com/polynetwork/poly/native/service/cross_chain_manager/btc"

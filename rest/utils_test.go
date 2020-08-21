@@ -53,11 +53,11 @@ func TestSth(t *testing.T) {
 
 	to, _ := btcutil.DecodeAddress("mpCNjy4QYAmw8eumHJRbVtt6bMDVQvPpFn", &chaincfg.TestNet3Params)
 	p2pkh, _ := txscript.PayToAddrScript(to)
-	out1 := wire.NewTxOut(int64(0.4*btcutil.SatoshiPerBitcoin) - 60000, p2pkh)
+	out1 := wire.NewTxOut(int64(0.4*btcutil.SatoshiPerBitcoin)-60000, p2pkh)
 	from, _ := btcutil.DecodeAddress("tb1qy94qnjuwu5w6r2g74z2z25khjdkgs6ssk5rjnyqrvcvpds8f7x9shrfspn",
 		&chaincfg.TestNet3Params)
 	p2wsh, _ := txscript.PayToAddrScript(from)
-	out2 := wire.NewTxOut(sum - int64(0.4*btcutil.SatoshiPerBitcoin), p2wsh)
+	out2 := wire.NewTxOut(sum-int64(0.4*btcutil.SatoshiPerBitcoin), p2wsh)
 	mtx.AddTxOut(out1)
 	mtx.AddTxOut(out2)
 

@@ -4,10 +4,10 @@ import (
 	"encoding/hex"
 	"github.com/btcsuite/btcutil"
 	"github.com/ontio/ontology/common"
+	"github.com/polynetwork/btc-vendor-tools/utils"
 	sdk "github.com/polynetwork/poly-go-sdk"
 	"github.com/polynetwork/poly/common/log"
 	mutils "github.com/polynetwork/poly/native/service/utils"
-	"github.com/polynetwork/vendortool/utils"
 	"strings"
 )
 

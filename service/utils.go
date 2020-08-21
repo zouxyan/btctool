@@ -3,12 +3,11 @@ package service
 import (
 	"encoding/hex"
 	"fmt"
-	"github.com/ConjurTech/switcheo-chain/cmd"
 	"github.com/cosmos/cosmos-sdk/types"
+	"github.com/ontio/ontology/common"
 	"github.com/polynetwork/poly-go-sdk"
 	mcom "github.com/polynetwork/poly/common"
 	"github.com/polynetwork/poly/native/service/cross_chain_manager/btc"
-	"github.com/ontio/ontology/common"
 	"strings"
 )
 
@@ -52,9 +51,9 @@ func buildData(toChainId uint64, ccFee int64, toAddr string) ([]byte, error) {
 		}
 	case 172:
 		config := types.GetConfig()
-		config.SetBech32PrefixForAccount(cmd.MainPrefix, cmd.MainPrefix+types.PrefixPublic)
-		config.SetBech32PrefixForValidator(cmd.MainPrefix+types.PrefixValidator+types.PrefixOperator, cmd.MainPrefix+types.PrefixValidator+types.PrefixOperator+types.PrefixPublic)
-		config.SetBech32PrefixForConsensusNode(cmd.MainPrefix+types.PrefixValidator+types.PrefixConsensus, cmd.MainPrefix+types.PrefixValidator+types.PrefixConsensus+types.PrefixPublic)
+		config.SetBech32PrefixForAccount("swth", "swthpub")
+		config.SetBech32PrefixForValidator("swthvaloper", "swthvaloperpub")
+		config.SetBech32PrefixForConsensusNode("swthvalcons", "swthvalconspub")
 		addr, _ := types.AccAddressFromBech32(toAddr)
 		args = &btc.Args{
 			Address:   addr[:],

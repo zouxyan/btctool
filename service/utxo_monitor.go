@@ -31,7 +31,7 @@ type UtxoStatus struct {
 
 type UtxoMonitor struct {
 	Status    *UtxoStatus
-	poly     *sdk.PolySdk
+	poly      *sdk.PolySdk
 	rk        []byte
 	lessPoint uint64
 	quit      chan struct{}
@@ -48,7 +48,7 @@ func NewUtxoMonitor(lp uint64, rpcAddr string, redeem []byte) *UtxoMonitor {
 	k := btcutil.Hash160(redeem)
 	return &UtxoMonitor{
 		Status:    &UtxoStatus{},
-		poly:     poly,
+		poly:      poly,
 		rk:        k,
 		lessPoint: lp,
 		quit:      make(chan struct{}),
